@@ -2,13 +2,42 @@
 # -*- coding: utf-8 -*-
 # filename: freecal.py
 
+import sys
+
 from math import *
 from pylab import *
 from csv import reader
 from numpy import asarray
+from optparse import OptionParser
+
+
+# OptionParser
+
+usage = "usage: %prog [option] arg1 [option] arg2 ..."
+
+parser = OptionParser(usage = usage)
+parser.add_option("-d",
+                "--date",
+                action="store",
+                type="int",
+                dest="date",
+                help="non calibrated radiocarbon date for sample",
+                metavar="DATE")
+parser.add_option("-s",
+                "--sigma",
+                action="store",
+                type="int",
+                dest="sigma",
+                help="standard deviation for date",
+                metavar="SIGMA")
+
+
+(options, args) = parser.parse_args()
+
+
+# GNUCal
 
 intcal04 = reader(open('intcal04_custom.14c'), skipinitialspace = True)
-
 intarray = asarray(list(intcal04))
 
 
@@ -32,4 +61,5 @@ plot(caar[:,0], caar[:,1])
 title("Radiocarbon Age vs Calibrated Age")
 xlabel("Cal BP")
 ylabel("Radiocarbon BP")
-show()
+savefig('gnucal.png')
+
