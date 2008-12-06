@@ -47,7 +47,7 @@ def calibrate(f_m, sigma_m, f_t, sigma_t):
     P_t = ( exp( - pow(f_m - f_t, 2 ) / ( 2 * ( sigma_sum ) ) ) / sqrt(sigma_sum) )
     return P_t
 
-f_m, sigma_m = 812, 16
+f_m, sigma_m = options.date, options.sigma
 
 caa = []
 for i in intarray:
