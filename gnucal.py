@@ -39,7 +39,10 @@ if not (options.date and options.sigma):
 
 # GNUCal
 
-intcal04 = reader(open('intcal04_custom.14c'), skipinitialspace = True)
+intcal04 = open('intcal04.14c') # Atmospheric data from Reimer et al (2004);
+intlines = intcal04.readlines()
+intnotcomment = [ l for l in intlines if not l.startswith('#')]
+intcal04 = reader(intnotcomment, skipinitialspace = True)
 intarray = asarray(list(intcal04))
 
 
