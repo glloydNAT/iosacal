@@ -60,10 +60,12 @@ for i in intarray:
 caar = asarray(caa)
 indices = caar[:,1].nonzero() # leave out the useless thousands of years
 valid_dates = indices[0]      # but do not leave out the intermediate zeros!
-caar_diff = min(caar[valid_dates[0]:valid_dates[-1],0]) - max(caar[valid_dates[0]:valid_dates[-1],0])
+#gizmo = len(valid_datez/8)
+#valid_dates = valid_datez[gizmo*2:gizmo*6]
+#caar_diff = min(caar[valid_dates[0]:valid_dates[-1],0]) - max(caar[valid_dates[0]:valid_dates[-1],0])
 
-sixtysix = [ calibrate(f_m + sigma_m, sigma_m, f_t, sigma_t),
-             calibrate(f_m - sigma_m, sigma_m, f_t, sigma_t) ]
+#sixtysix = [ calibrate(f_m + sigma_m, sigma_m, f_t, sigma_t),
+#             calibrate(f_m - sigma_m, sigma_m, f_t, sigma_t) ]
 
 orig_norm = norm(loc=f_m, scale=sigma_m)
 orig_pdf  = orig_norm.pdf(caar[valid_dates[0]:valid_dates[-1],0])
@@ -74,26 +76,28 @@ ax1 = plt.subplot(111)
 plt.title("Radiocarbon Age vs Calibrated Age")
 plt.xlabel("Calibrated BP")
 plt.ylabel("Radiocarbon BP")
-#ax2.set_xlim(
-#    min(caar[valid_dates[0]:valid_dates[-1],0]) + caar_diff / 2,
-#    max(caar[valid_dates[0]:valid_dates[-1],0]) - caar_diff / 2
-#    )
-ax1.yaxis.tick_right()
 
 ax2 = plt.twinx()
-
-plt.fill(
+ax2.fill(
+    caar[valid_dates[0]:valid_dates[-1],0],
+    caar[valid_dates[0]:valid_dates[-1],1],
+    alpha=0.3
+    )
+ax2.plot(
     caar[valid_dates[0]:valid_dates[-1],0],
     caar[valid_dates[0]:valid_dates[-1],1]
     )
-#ax1.set_xlim(
-#    min(caar[valid_dates[0]:valid_dates[-1],0]) + caar_diff / 2,
-#    max(caar[valid_dates[0]:valid_dates[-1],0]) - caar_diff / 2
-#    )
-plt.grid()
+ax2.set_xbound(min(orig_pdf),max(orig_pdf)*3)
+ax2.set_axis_off()
 
 ax3 = plt.twiny(ax1)
-plt.fill(
+ax3.fill(
+    orig_pdf,
+    caar[valid_dates[0]:valid_dates[-1],0],
+    'g-',
+    alpha=0.3
+    )
+ax3.plot(
     orig_pdf,
     caar[valid_dates[0]:valid_dates[-1],0],
     'g-'
@@ -106,6 +110,7 @@ ax1.plot(
     intarray[valid_dates[0]:valid_dates[-1],1],
     'r-'
     )
+ax1.grid()
 
 plt.show()
 
