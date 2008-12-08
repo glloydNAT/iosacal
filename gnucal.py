@@ -4,6 +4,7 @@
 
 import sys
 import matplotlib.pyplot as plt
+import matplotlib.mlab as mlab
 
 from math import *
 from csv import reader
@@ -106,6 +107,15 @@ ax3.plot(
     )
 ax3.set_xbound(min(orig_pdf),max(orig_pdf)*3)
 ax3.set_axis_off()
+
+mlab_low = [ float(n[1]) - float(n[2]) for n in intarray]
+mlab_high = [ float(n[1]) + float(n[2]) for n in intarray]
+
+xs, ys = mlab.poly_between(intarray[:,0],
+                           mlab_low,
+                           mlab_high
+                           )
+ax1.fill(xs, ys, 'r', alpha=0.3)
 
 ax1.plot(
     intarray[valid_dates[0]:valid_dates[-1],0],
