@@ -60,6 +60,7 @@ for i in intarray:
 caar = asarray(caa)
 indices = caar[:,1].nonzero() # leave out the useless thousands of years
 valid_dates = indices[0]      # but do not leave out the intermediate zeros!
+caar_diff = min(caar[valid_dates[0]:valid_dates[-1],0]) - max(caar[valid_dates[0]:valid_dates[-1],0])
 
 sixtysix = [ calibrate(f_m + sigma_m, sigma_m, f_t, sigma_t),
              calibrate(f_m - sigma_m, sigma_m, f_t, sigma_t) ]
@@ -69,34 +70,41 @@ orig_pdf  = orig_norm.pdf(caar[valid_dates[0]:valid_dates[-1],0])
 
 # Plots
 
-ax1 = plt.subplot(224)
+ax1 = plt.subplot(111)
 plt.title("Radiocarbon Age vs Calibrated Age")
-plt.xlabel("Cal BP")
+plt.xlabel("Calibrated BP")
 plt.ylabel("Radiocarbon BP")
+#ax2.set_xlim(
+#    min(caar[valid_dates[0]:valid_dates[-1],0]) + caar_diff / 2,
+#    max(caar[valid_dates[0]:valid_dates[-1],0]) - caar_diff / 2
+#    )
+ax1.yaxis.tick_right()
+
+ax2 = plt.twinx()
+
 plt.fill(
     caar[valid_dates[0]:valid_dates[-1],0],
     caar[valid_dates[0]:valid_dates[-1],1]
     )
+#ax1.set_xlim(
+#    min(caar[valid_dates[0]:valid_dates[-1],0]) + caar_diff / 2,
+#    max(caar[valid_dates[0]:valid_dates[-1],0]) - caar_diff / 2
+#    )
 plt.grid()
 
-ax2 = plt.subplot(222, sharex=ax1)
-plt.title("Calibration curve")
-plt.xlabel("Cal BP")
-plt.ylabel("Radiocarbon BP")
-plt.plot(
-    intarray[valid_dates[0]:valid_dates[-1],0],
-    intarray[valid_dates[0]:valid_dates[-1],1],
-    'r-'
-    )
-
-ax3 = plt.subplot(221, sharey=ax2)
-plt.title("Radiocarbon Age")
-plt.xlabel("Probability function")
-plt.ylabel("Radiocarbon BP")
+ax3 = plt.twiny(ax1)
 plt.fill(
     orig_pdf,
     caar[valid_dates[0]:valid_dates[-1],0],
     'g-'
+    )
+ax3.set_xbound(min(orig_pdf),max(orig_pdf)*3)
+ax3.set_axis_off()
+
+ax1.plot(
+    intarray[valid_dates[0]:valid_dates[-1],0],
+    intarray[valid_dates[0]:valid_dates[-1],1],
+    'r-'
     )
 
 plt.show()
