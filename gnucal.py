@@ -9,7 +9,7 @@ from math import *
 from csv import reader
 from numpy import asarray
 from optparse import OptionParser
-from scipy.stats import norm
+from pylab import normpdf
 
 
 # OptionParser
@@ -70,8 +70,7 @@ valid_dates = indices[0]      # but do not leave out the intermediate zeros!
 #sixtysix = [ calibrate(f_m + sigma_m, sigma_m, f_t, sigma_t),
 #             calibrate(f_m - sigma_m, sigma_m, f_t, sigma_t) ]
 
-orig_norm = norm(loc=f_m, scale=sigma_m)
-orig_pdf  = orig_norm.pdf(caar[valid_dates[0]:valid_dates[-1],0])
+orig_pdf = normpdf(caar[valid_dates[0]:valid_dates[-1],0], f_m, sigma_m)
 
 # Plots
 
