@@ -6,7 +6,7 @@ import sys
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 
-from math import *
+from math import pow, exp, sqrt
 from csv import reader
 from numpy import asarray
 from optparse import OptionParser
@@ -73,25 +73,29 @@ valid_dates = indices[0]      # but do not leave out the intermediate zeros!
 
 orig_pdf = normpdf(caar[valid_dates[0]:valid_dates[-1],0], f_m, sigma_m)
 
-# Plots
+## Plots
 
 ax1 = plt.subplot(111)
 plt.title("Radiocarbon Age vs Calibrated Age")
 plt.xlabel("Calibrated BP")
 plt.ylabel("Radiocarbon BP")
 
+# Calendar Age
+
 ax2 = plt.twinx()
 ax2.fill(
     caar[valid_dates[0]:valid_dates[-1],0],
     caar[valid_dates[0]:valid_dates[-1],1],
-    alpha=0.3
+    alpha=0.3,
+    label='Calendar Age'
     )
 ax2.plot(
     caar[valid_dates[0]:valid_dates[-1],0],
     caar[valid_dates[0]:valid_dates[-1],1]
     )
-ax2.set_xbound(min(orig_pdf),max(orig_pdf)*3)
 ax2.set_axis_off()
+
+# Radiocarbon Age
 
 ax3 = plt.twiny(ax1)
 ax3.fill(
@@ -103,13 +107,16 @@ ax3.fill(
 ax3.plot(
     orig_pdf,
     caar[valid_dates[0]:valid_dates[-1],0],
-    'g-'
+    'g-',
+    label='Radiocarbon Age'
     )
 ax3.set_xbound(min(orig_pdf),max(orig_pdf)*3)
 ax3.set_axis_off()
 
-mlab_low = [ float(n[1]) - float(n[2]) for n in intarray]
-mlab_high = [ float(n[1]) + float(n[2]) for n in intarray]
+# Calibration Curve
+
+mlab_low  = [ float(n[1]) - float(n[2]) for n in intarray ]
+mlab_high = [ float(n[1]) + float(n[2]) for n in intarray ]
 
 xs, ys = mlab.poly_between(intarray[:,0],
                            mlab_low,
@@ -120,9 +127,9 @@ ax1.fill(xs, ys, 'r', alpha=0.3)
 ax1.plot(
     intarray[valid_dates[0]:valid_dates[-1],0],
     intarray[valid_dates[0]:valid_dates[-1],1],
-    'r-'
+    'r-',
+    label='Calibration curve'
     )
 ax1.grid()
-
 plt.show()
 
