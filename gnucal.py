@@ -3,12 +3,13 @@
 # filename: freecal.py
 
 import sys
+import matplotlib.pyplot as plt
 
 from math import *
-from pylab import *
 from csv import reader
 from numpy import asarray
 from optparse import OptionParser
+from scipy.stats import norm
 
 
 # OptionParser
@@ -33,7 +34,8 @@ parser.add_option("-s",
 
 
 (options, args) = parser.parse_args()
-
+if not (options.date and options.sigma):
+    sys.exit('Please provide date and standard deviation')
 
 # GNUCal
 
@@ -56,10 +58,46 @@ for i in intarray:
     caa.append((int(i[0]),ca))
 
 caar = asarray(caa)
-#indices = caar[:,1].nonzero()
-plot(caar[:,0], caar[:,1])
-title("Radiocarbon Age vs Calibrated Age")
-xlabel("Cal BP")
-ylabel("Radiocarbon BP")
-savefig('gnucal.png')
+indices = caar[:,1].nonzero() # leave out the useless thousands of years
+valid_dates = indices[0]      # but do not leave out the intermediate zeros!
+
+sixtysix = [ calibrate(f_m + sigma_m, sigma_m, f_t, sigma_t),
+             calibrate(f_m - sigma_m, sigma_m, f_t, sigma_t) ]
+
+orig_norm = norm(loc=f_m, scale=sigma_m)
+orig_pdf  = orig_norm.pdf(caar[valid_dates[0]:valid_dates[-1],0])
+
+# Plots
+
+ax1 = plt.subplot(224)
+plt.title("Radiocarbon Age vs Calibrated Age")
+plt.xlabel("Cal BP")
+plt.ylabel("Radiocarbon BP")
+plt.fill(
+    caar[valid_dates[0]:valid_dates[-1],0],
+    caar[valid_dates[0]:valid_dates[-1],1]
+    )
+plt.grid()
+
+ax2 = plt.subplot(222, sharex=ax1)
+plt.title("Calibration curve")
+plt.xlabel("Cal BP")
+plt.ylabel("Radiocarbon BP")
+plt.plot(
+    intarray[valid_dates[0]:valid_dates[-1],0],
+    intarray[valid_dates[0]:valid_dates[-1],1],
+    'r-'
+    )
+
+ax3 = plt.subplot(221, sharey=ax2)
+plt.title("Radiocarbon Age")
+plt.xlabel("Probability function")
+plt.ylabel("Radiocarbon BP")
+plt.fill(
+    orig_pdf,
+    caar[valid_dates[0]:valid_dates[-1],0],
+    'g-'
+    )
+
+plt.show()
 
