@@ -1,6 +1,23 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# filename: freecal.py
+# filename: gnucal.py
+# Copyright 2008 Stefano Costa <steko@iosa.it>
+# 
+# This file is part of GNUCal.
+
+# GNUCal is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# GNUCal is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with GNUCal.  If not, see <http://www.gnu.org/licenses/>.
+
 
 import sys
 import matplotlib.pyplot as plt
@@ -9,7 +26,7 @@ import matplotlib.mlab as mlab
 from math import pow, exp, sqrt
 from csv import reader
 from numpy import asarray
-from optparse import OptionParser
+from optparse import OptionParser, OptionGroup
 from pylab import normpdf
 
 
@@ -23,7 +40,7 @@ parser.add_option("-d",
                 action="store",
                 type="int",
                 dest="date",
-                help="non calibrated radiocarbon date for sample",
+                help="non calibrated radiocarbon BP date for sample",
                 metavar="DATE")
 parser.add_option("-s",
                 "--sigma",
@@ -32,11 +49,24 @@ parser.add_option("-s",
                 dest="sigma",
                 help="standard deviation for date",
                 metavar="SIGMA")
-
+group = OptionGroup(parser, 'BP or BC/AD output',
+                    'Use these two mutually exclusive options to choose which '
+                    'type of dates you like as output.')
+parser.set_defaults(BP=True)
+group.add_option("--bp",
+                action="store_true",
+                dest="BP",
+                help="express date in Calibrated BP Age (default action)")
+group.add_option("--ad",
+                action="store_false",
+                dest="BP",
+                help="express date in Calibrated BC/AD Calendar Age")
+parser.add_option_group(group)
 
 (options, args) = parser.parse_args()
 if not (options.date and options.sigma):
     sys.exit('Please provide date and standard deviation')
+
 
 # GNUCal
 
@@ -59,7 +89,10 @@ caa = []
 for i in intarray:
     f_t, sigma_t = map(float, i[1:3])
     ca = calibrate(f_m, sigma_m, f_t, sigma_t)
-    caa.append((int(i[0]),ca))
+    if options.BP:
+        caa.append((int(i[0]),ca))
+    else:
+        caa.append((1950-int(i[0]),ca))
 
 caar = asarray(caa)
 indices = caar[:,1].nonzero() # leave out the useless thousands of years
@@ -131,5 +164,6 @@ ax1.plot(
     label='Calibration curve'
     )
 ax1.grid()
+
 plt.show()
 
