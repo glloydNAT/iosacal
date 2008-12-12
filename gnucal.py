@@ -105,6 +105,7 @@ valid_dates = indices[0]      # but do not leave out the intermediate zeros!
 #sixtysix = [ calibrate(f_m + sigma_m, sigma_m, f_t, sigma_t),
 #             calibrate(f_m - sigma_m, sigma_m, f_t, sigma_t) ]
 
+# Normal (Gaussian) curve, used only for plotting!
 orig_pdf = normpdf(caar[valid_dates[0]:valid_dates[-1],0], f_m, sigma_m)
 
 ## Plots
@@ -180,7 +181,7 @@ ax1.plot(
     'r-',
     label='Calibrated date'
     )
-ax1.grid()
+#ax1.grid()
 
-plt.show()
+plt.savefig('image_%d±%d.png' %(f_m, sigma_m))
 
