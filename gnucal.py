@@ -89,10 +89,10 @@ caa = []
 for i in intarray:
     f_t, sigma_t = map(float, i[1:3])
     ca = calibrate(f_m, sigma_m, f_t, sigma_t)
-    if options.BP:
+    if ca > 0.00000001:
         caa.append((int(i[0]),ca))
-    else:
-        caa.append((1950-int(i[0]),ca))
+#    else:
+#        caa.append((1950-int(i[0]),ca))
 
 caar = asarray(caa)
 indices = caar[:,1].nonzero() # leave out the useless thousands of years
@@ -126,6 +126,7 @@ ax2.plot(
     caar[valid_dates[0]:valid_dates[-1],0],
     caar[valid_dates[0]:valid_dates[-1],1]
     )
+ax2.set_ybound(min(caar[valid_dates[0]:valid_dates[-1],1]),max(caar[valid_dates[0]:valid_dates[-1],1])*3)
 ax2.set_axis_off()
 
 # Radiocarbon Age
