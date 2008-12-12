@@ -110,8 +110,14 @@ orig_pdf = normpdf(caar[valid_dates[0]:valid_dates[-1],0], f_m, sigma_m)
 
 ax1 = plt.subplot(111)
 plt.title("Radiocarbon Age vs Calibrated Age")
-plt.xlabel("Calibrated BP")
-plt.ylabel("Radiocarbon BP")
+plt.xlabel("Calibrated date (BP)")
+plt.ylabel("Radiocarbon determination (BP)")
+plt.text(0.9, 0.9,r'$%d \pm %d$' % (f_m, sigma_m),
+     horizontalalignment='center',
+     verticalalignment='center',
+     transform = ax1.transAxes,
+     bbox=dict(facecolor='white', alpha=0.5, edgecolor=None))
+
 
 # Calendar Age
 
@@ -142,7 +148,7 @@ ax3.plot(
     orig_pdf,
     caar[valid_dates[0]:valid_dates[-1],0],
     'g-',
-    label='Radiocarbon Age'
+    label='Radiocarbon determination (BP)'
     )
 ax3.set_xbound(min(orig_pdf),max(orig_pdf)*3)
 ax3.set_axis_off()
@@ -162,7 +168,7 @@ ax1.plot(
     intarray[valid_dates[0]:valid_dates[-1],0],
     intarray[valid_dates[0]:valid_dates[-1],1],
     'r-',
-    label='Calibration curve'
+    label='Calibrated date'
     )
 ax1.grid()
 
