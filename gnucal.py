@@ -22,10 +22,11 @@
 import sys
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
+import matplotlib.patches as pch
 
 from math import pow, exp, sqrt
 from csv import reader
-from numpy import asarray
+from numpy import asarray, diff
 from optparse import OptionParser, OptionGroup
 from pylab import normpdf
 
@@ -134,6 +135,15 @@ ax2.plot(
     )
 ax2.set_ybound(min(caar[valid_dates[0]:valid_dates[-1],1]),max(caar[valid_dates[0]:valid_dates[-1],1])*3)
 ax2.set_axis_off()
+
+# Calibrated curve area
+# From Paul Bourke's webpage: http://astronomy.swin.edu.au/~pbourke/geometry
+
+polyg = pch.Polygon(caar[valid_dates[0]:valid_dates[-1],0:2])
+polyv = polyg.get_verts()
+polyv_first = polyv[:-1][:,[1,0]]
+polyv_second = polyv[1:]
+polyg_area = diff(polyv_first*polyv_second).sum()/2.0
 
 # Radiocarbon Age
 
