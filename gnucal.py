@@ -26,9 +26,11 @@ import matplotlib.patches as pch
 
 from math import pow, exp, sqrt
 from csv import reader
-from numpy import asarray, diff
+from numpy import array, asarray, concatenate, diff, sort, amax
 from optparse import OptionParser, OptionGroup
 from pylab import normpdf
+
+from utils import hpd
 
 
 # OptionParser
@@ -100,13 +102,13 @@ indices = caar[:,1].nonzero() # leave out the useless thousands of years
 valid_dates = indices[0]      # but do not leave out the intermediate zeros!
 #gizmo = len(valid_datez/8)
 #valid_dates = valid_datez[gizmo*2:gizmo*6]
-#caar_diff = min(caar[valid_dates[0]:valid_dates[-1],0]) - max(caar[valid_dates[0]:valid_dates[-1],0])
+#caar_diff = min(caar[:,0]) - max(caar[:,0])
 
 #sixtysix = [ calibrate(f_m + sigma_m, sigma_m, f_t, sigma_t),
 #             calibrate(f_m - sigma_m, sigma_m, f_t, sigma_t) ]
 
 # Normal (Gaussian) curve, used only for plotting!
-orig_pdf = normpdf(caar[valid_dates[0]:valid_dates[-1],0], f_m, sigma_m)
+orig_pdf = normpdf(caar[:,0], f_m, sigma_m)
 
 ## Plots
 
@@ -114,51 +116,98 @@ ax1 = plt.subplot(111)
 plt.title("Radiocarbon Age vs Calibrated Age")
 plt.xlabel("Calibrated date (BP)")
 plt.ylabel("Radiocarbon determination (BP)")
-plt.text(0.9, 0.9,r'$%d \pm %d$' % (f_m, sigma_m),
+plt.text(0.5, 0.95,r'$STEKO: %d \pm %d BP$' % (f_m, sigma_m),
      horizontalalignment='center',
      verticalalignment='center',
      transform = ax1.transAxes,
-     bbox=dict(facecolor='white', alpha=0.5, edgecolor=None))
+     bbox=dict(facecolor='white', alpha=0.9, edgecolor=None))
+plt.text(0.95, 0.90,r'STEKO123: $%d \pm %d BP$' % (f_m, sigma_m),
+     horizontalalignment='center',
+     verticalalignment='center',
+     transform = ax1.transAxes,
+     bbox=dict(facecolor='white', alpha=0.9, edgecolor=None))
 
 
 # Calendar Age
 
 ax2 = plt.twinx()
 ax2.fill(
-    caar[valid_dates[0]:valid_dates[-1],0],
-    caar[valid_dates[0]:valid_dates[-1],1],
-    alpha=0.3,
+    caar[:,0],
+    caar[:,1],
+    'k',#alpha=0.3,
     label='Calendar Age'
     )
 ax2.plot(
-    caar[valid_dates[0]:valid_dates[-1],0],
-    caar[valid_dates[0]:valid_dates[-1],1]
+    caar[:,0],
+    caar[:,1],
+    'k'
     )
-ax2.set_ybound(min(caar[valid_dates[0]:valid_dates[-1],1]),max(caar[valid_dates[0]:valid_dates[-1],1])*3)
+ax2.set_ybound(min(caar[:,1]),max(caar[:,1])*3)
 ax2.set_axis_off()
+
 
 # Calibrated curve area
 # From Paul Bourke's webpage: http://astronomy.swin.edu.au/~pbourke/geometry
 
-polyg = pch.Polygon(caar[valid_dates[0]:valid_dates[-1],0:2])
-polyv = polyg.get_verts()
-polyv_first = polyv[:-1][:,[1,0]]
-polyv_second = polyv[1:]
-polyg_area = diff(polyv_first*polyv_second).sum()/2.0
+def area(polyg):
+    polyv = polyg.get_verts()
+    polyv_first = polyv[:-1][:,[1,0]]
+    polyv_second = polyv[1:]
+    polyg_area = diff(polyv_first*polyv_second).sum()/2.0
+    return polyg_area
+
+polyg = pch.Polygon(caar[:,0:2])
+polyg_area = area(polyg)
+
+alpha = 0.046
+polyg_alpha = polyg_area * (1 - alpha)
+
+p_max = polyg.get_verts().max(0)[1]
+#for f in range(0,p_max,100):
+#    p_path = 0
+#    pathdata = [
+#        (Path.MOVETO, (1.58, -2.57)),
+#        (Path.CURVE4, (0.35, -1.1)),
+#        (Path.CURVE4, (-1.75, 2.0)),
+#        (Path.CURVE4, (0.375, 2.0)),
+#        (Path.LINETO, (0.85, 1.15)),
+#        (Path.CURVE4, (2.2, 3.2)),
+#        (Path.CURVE4, (3, 0.05)),
+#        (Path.CURVE4, (2.0, -0.5)),
+#        (Path.CLOSEPOLY, (1.58, -2.57)),
+#        ]
+
+#    codes, verts = zip(*pathdata)
+#    path = mpath.Path(verts, codes)
+#        p_clip = polyg.set_clip_path()
+
+def boa_hpd(x, alpha):
+    n = len(x)
+    m = int(max(1, round(n*alpha)+1))
+    
+    #y = sorted(x[:,1])
+    y = x.argsort(axis=0)
+    a = y[0:n]
+    b = y[n + m:m-1]
+    
+    return n, m
+
+print boa_hpd(caar,0.046)
 
 # Radiocarbon Age
 
 ax3 = plt.twiny(ax1)
 ax3.fill(
     orig_pdf,
-    caar[valid_dates[0]:valid_dates[-1],0],
-    'g-',
+    caar[:,0],
+    'r',
     alpha=0.3
     )
 ax3.plot(
     orig_pdf,
-    caar[valid_dates[0]:valid_dates[-1],0],
-    'g-',
+    caar[:,0],
+    'r',
+    alpha=0.3,
     label='Radiocarbon determination (BP)'
     )
 ax3.set_xbound(min(orig_pdf),max(orig_pdf)*3)
@@ -171,16 +220,17 @@ mlab_high = [ float(n[1]) + float(n[2]) for n in intarray ]
 
 xs, ys = mlab.poly_between(intarray[:,0],
                            mlab_low,
-                           mlab_high
-                           )
-ax1.fill(xs, ys, 'r', alpha=0.3)
+                           mlab_high)
+ax1.fill(xs, ys, 'b', alpha=0.3)
 
-ax1.plot(
-    intarray[valid_dates[0]:valid_dates[-1],0],
-    intarray[valid_dates[0]:valid_dates[-1],1],
-    'r-',
-    label='Calibrated date'
-    )
+#ax1.plot(
+#    intarray[:,0],
+#    intarray[:,1],
+#    'b-',
+#    label='Calibrated date'
+#    )
+tk = ax1.get_xaxis().get_minor_ticks()
+ax1.plot(tk)
 #ax1.grid()
 
 plt.savefig('image_%d±%d.png' %(f_m, sigma_m))
