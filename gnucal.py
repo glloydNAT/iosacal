@@ -26,7 +26,7 @@ import matplotlib.patches as pch
 
 from math import pow, exp, sqrt
 from csv import reader
-from numpy import array, asarray, concatenate, diff, sort, amax
+from numpy import array, asarray, sort
 from optparse import OptionParser, OptionGroup
 from pylab import normpdf
 from hpd import alsuren_hpd
@@ -147,55 +147,6 @@ ax2.plot(
     )
 ax2.set_ybound(min(caar[:,1]),max(caar[:,1])*3)
 ax2.set_axis_off()
-
-
-# Calibrated curve area
-# From Paul Bourke's webpage: http://astronomy.swin.edu.au/~pbourke/geometry
-
-def area(polyg):
-    polyv = polyg.get_verts()
-    polyv_first = polyv[:-1][:,[1,0]]
-    polyv_second = polyv[1:]
-    polyg_area = diff(polyv_first*polyv_second).sum()/2.0
-    return polyg_area
-
-polyg = pch.Polygon(caar[:,0:2])
-polyg_area = area(polyg)
-
-alpha = 0.046
-polyg_alpha = polyg_area * (1 - alpha)
-
-p_max = polyg.get_verts().max(0)[1]
-#for f in range(0,p_max,100):
-#    p_path = 0
-#    pathdata = [
-#        (Path.MOVETO, (1.58, -2.57)),
-#        (Path.CURVE4, (0.35, -1.1)),
-#        (Path.CURVE4, (-1.75, 2.0)),
-#        (Path.CURVE4, (0.375, 2.0)),
-#        (Path.LINETO, (0.85, 1.15)),
-#        (Path.CURVE4, (2.2, 3.2)),
-#        (Path.CURVE4, (3, 0.05)),
-#        (Path.CURVE4, (2.0, -0.5)),
-#        (Path.CLOSEPOLY, (1.58, -2.57)),
-#        ]
-
-#    codes, verts = zip(*pathdata)
-#    path = mpath.Path(verts, codes)
-#        p_clip = polyg.set_clip_path()
-
-def boa_hpd(x, alpha):
-    n = len(x)
-    m = int(max(1, round(n*alpha)+1))
-    
-    #y = sorted(x[:,1])
-    y = x.argsort(axis=0)
-    a = y[0:n]
-    b = y[n + m:m-1]
-    
-    return n, m
-
-print boa_hpd(caar,0.046)
 
 # Radiocarbon Age
 
