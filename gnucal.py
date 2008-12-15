@@ -29,8 +29,7 @@ from csv import reader
 from numpy import array, asarray, concatenate, diff, sort, amax
 from optparse import OptionParser, OptionGroup
 from pylab import normpdf
-
-from utils import hpd
+from hpd import alsuren_hpd
 
 
 # OptionParser
@@ -100,15 +99,19 @@ for i in intarray:
 caar = asarray(caa)
 indices = caar[:,1].nonzero() # leave out the useless thousands of years
 valid_dates = indices[0]      # but do not leave out the intermediate zeros!
-#gizmo = len(valid_datez/8)
-#valid_dates = valid_datez[gizmo*2:gizmo*6]
-#caar_diff = min(caar[:,0]) - max(caar[:,0])
-
-#sixtysix = [ calibrate(f_m + sigma_m, sigma_m, f_t, sigma_t),
-#             calibrate(f_m - sigma_m, sigma_m, f_t, sigma_t) ]
 
 # Normal (Gaussian) curve, used only for plotting!
 orig_pdf = normpdf(caar[:,0], f_m, sigma_m)
+
+# Confidence intervals
+
+hpd68 = list(alsuren_hpd(caar,0.318))
+confid68 = hpd68
+for i in hpd68:
+    if i + 5 in hpd68 and i - 5 in hpd68:
+        confid68.remove(i)
+hpd95 = alsuren_hpd(caar,0.046)
+
 
 ## Plots
 
@@ -121,7 +124,7 @@ plt.text(0.5, 0.95,r'$STEKO: %d \pm %d BP$' % (f_m, sigma_m),
      verticalalignment='center',
      transform = ax1.transAxes,
      bbox=dict(facecolor='white', alpha=0.9, edgecolor=None))
-plt.text(0.95, 0.90,r'STEKO123: $%d \pm %d BP$' % (f_m, sigma_m),
+plt.text(0.95, 0.90,r'68.2%% probability\n\t%s' % str(confid68),
      horizontalalignment='center',
      verticalalignment='center',
      transform = ax1.transAxes,
