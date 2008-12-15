@@ -101,14 +101,19 @@ calibrated_curve = asarray(calibrated_list)
 sample_curve = normpdf(calibrated_curve[:,0], f_m, sigma_m)
 
 # Confidence intervals
-
-hpd68 = list(alsuren_hpd(caar,0.318))
-confid68 = hpd68
+hpd68 = list(alsuren_hpd(calibrated_curve,0.318))
+confid68 = []
 for i in hpd68:
-    if i + 5 in hpd68 and i - 5 in hpd68:
-        confid68.remove(i)
-hpd95 = alsuren_hpd(caar,0.046)
+    if (i + 5 not in hpd68) ^ (i - 5 not in hpd68): # ^ is the XOR operator
+        confid68.append(i)
+intervals68 = asarray(confid68).reshape(len(confid68)/2,2)
 
+hpd95 = list(alsuren_hpd(calibrated_curve,0.046))
+confid95 = []
+for i in hpd95:
+    if (i + 5 not in hpd95) ^ (i - 5 not in hpd95): # ^ is the XOR operator
+        confid95.append(i)
+intervals95 = asarray(confid95).reshape(len(confid95)/2,2)
 
 ## Plots
 
@@ -140,7 +145,8 @@ ax2 = plt.twinx()
 ax2.fill(
     calibrated_curve[:,0],
     calibrated_curve[:,1],
-    'k',#alpha=0.3,
+    'k',
+    alpha=0.3,
     label='Calendar Age'
     )
 ax2.plot(
@@ -180,15 +186,12 @@ xs, ys = mlab.poly_between(intarray[:,0],
                            mlab_high)
 ax1.fill(xs, ys, 'b', alpha=0.3)
 
-#ax1.plot(
-#    intarray[:,0],
-#    intarray[:,1],
-#    'b-',
-#    label='Calibrated date'
-#    )
-tk = ax1.get_xaxis().get_minor_ticks()
-ax1.plot(tk)
-#ax1.grid()
+# Confidence intervals
+
+for i in intervals95:
+    ax1.axvspan(i[1], i[0], ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
+for i in intervals68:
+    ax1.axvspan(i[1], i[0], ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
 
 plt.savefig('image_%d±%d.png' %(f_m, sigma_m))
 
