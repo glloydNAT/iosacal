@@ -22,17 +22,17 @@
 import sys
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
-import matplotlib.patches as pch
 
-from math import pow, exp, sqrt
 from csv import reader
+from math import pow, exp, sqrt
 from numpy import array, asarray, sort
 from optparse import OptionParser, OptionGroup
 from pylab import normpdf
+
 from hpd import alsuren_hpd
 
 
-# OptionParser
+## OptionParser
 
 usage = "usage: %prog [option] arg1 [option] arg2 ..."
 
@@ -70,7 +70,7 @@ if not (options.date and options.sigma):
     sys.exit('Please provide date and standard deviation')
 
 
-# GNUCal
+## GNUCal itself
 
 intcal04 = open('intcal04.14c') # Atmospheric data from Reimer et al (2004);
 intlines = intcal04.readlines()
@@ -87,21 +87,18 @@ def calibrate(f_m, sigma_m, f_t, sigma_t):
 
 f_m, sigma_m = options.date, options.sigma
 
-caa = []
+calibrated_list = []
 for i in intarray:
     f_t, sigma_t = map(float, i[1:3])
     ca = calibrate(f_m, sigma_m, f_t, sigma_t)
+    # FIXME this treshold value is completely arbitrary
     if ca > 0.00000001:
-        caa.append((int(i[0]),ca))
-#    else:
-#        caa.append((1950-int(i[0]),ca))
+        calibrated_list.append((int(i[0]),ca))
 
-caar = asarray(caa)
-indices = caar[:,1].nonzero() # leave out the useless thousands of years
-valid_dates = indices[0]      # but do not leave out the intermediate zeros!
+calibrated_curve = asarray(calibrated_list)
 
 # Normal (Gaussian) curve, used only for plotting!
-orig_pdf = normpdf(caar[:,0], f_m, sigma_m)
+sample_curve = normpdf(calibrated_curve[:,0], f_m, sigma_m)
 
 # Confidence intervals
 
@@ -124,47 +121,53 @@ plt.text(0.5, 0.95,r'$STEKO: %d \pm %d BP$' % (f_m, sigma_m),
      verticalalignment='center',
      transform = ax1.transAxes,
      bbox=dict(facecolor='white', alpha=0.9, edgecolor=None))
-plt.text(0.95, 0.90,r'68.2%% probability\n\t%s' % str(confid68),
+plt.text(0.95, 0.90,'68.2%% probability\n%s' % str(confid68),
      horizontalalignment='center',
      verticalalignment='center',
      transform = ax1.transAxes,
      bbox=dict(facecolor='white', alpha=0.9, edgecolor=None))
+plt.text(0.0, 1.0,'GNUCal 0.1; IntCal04 atmospheric curve (Reimer et al. 2004)',
+     horizontalalignment='left',
+     verticalalignment='center',
+     transform = ax1.transAxes,
+     size=7,
+     bbox=dict(facecolor='white', alpha=0.9, lw=0))
 
 
 # Calendar Age
 
 ax2 = plt.twinx()
 ax2.fill(
-    caar[:,0],
-    caar[:,1],
+    calibrated_curve[:,0],
+    calibrated_curve[:,1],
     'k',#alpha=0.3,
     label='Calendar Age'
     )
 ax2.plot(
-    caar[:,0],
-    caar[:,1],
+    calibrated_curve[:,0],
+    calibrated_curve[:,1],
     'k'
     )
-ax2.set_ybound(min(caar[:,1]),max(caar[:,1])*3)
+ax2.set_ybound(min(calibrated_curve[:,1]),max(calibrated_curve[:,1])*3)
 ax2.set_axis_off()
 
 # Radiocarbon Age
 
 ax3 = plt.twiny(ax1)
 ax3.fill(
-    orig_pdf,
-    caar[:,0],
+    sample_curve,
+    calibrated_curve[:,0],
     'r',
     alpha=0.3
     )
 ax3.plot(
-    orig_pdf,
-    caar[:,0],
+    sample_curve,
+    calibrated_curve[:,0],
     'r',
     alpha=0.3,
     label='Radiocarbon determination (BP)'
     )
-ax3.set_xbound(min(orig_pdf),max(orig_pdf)*3)
+ax3.set_xbound(min(sample_curve),max(sample_curve)*3)
 ax3.set_axis_off()
 
 # Calibration Curve
