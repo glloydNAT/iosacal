@@ -179,9 +179,9 @@ ax1.fill(xs, ys, 'b', alpha=0.3)
 # Confidence intervals
 
 for i in intervals95:
-    ax1.axvspan(i[1], i[0], ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
+    ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
 for i in intervals68:
-    ax1.axvspan(i[1], i[0], ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
+    ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.8)
 
 plt.savefig('image_%d±%d.png' %(f_m, sigma_m))
 
