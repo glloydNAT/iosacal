@@ -26,6 +26,14 @@ options.
   -s SIGMA, --sigma=SIGMA
                         standard deviation for date
 
+The typical usage is therefore like::
+
+    ./gnucal.py -d 790 -s 60
+
+The result is saved into the image named ``image_790±60.png``,
+which qualifies as a unique name in the context of radiocarbon
+dating.
+
 What is does
 ============
 
