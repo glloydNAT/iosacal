@@ -152,7 +152,8 @@ ax2.fill(
 ax2.plot(
     calibrated_curve[:,0],
     calibrated_curve[:,1],
-    'k'
+    'k',
+    alpha=0
     )
 ax2.set_ybound(min(calibrated_curve[:,1]),max(calibrated_curve[:,1])*3)
 ax2.set_axis_off()
