@@ -20,6 +20,7 @@
 # along with GNUCal.  If not, see <http://www.gnu.org/licenses/>.
 
 from copy import copy
+from numpy import asarray
 
 def alsuren_hpd(x, alpha):
     
@@ -30,5 +31,10 @@ def alsuren_hpd(x, alpha):
     threshold_index = c.searchsorted(1-alpha)
     threshold_p = zz[threshold_index][1]
     ts_ix = x[:,1]>threshold_p
-    
-    return x[ts_ix,0]
+    hpd = list(x[ts_ix,0])
+    confid = list()
+    for i in hpd:
+        if (i + 5 not in hpd) ^ (i - 5 not in hpd): # ^ is the XOR operator
+            confid.append(i)
+    intervals = asarray(confid).reshape(len(confid)/2,2)
+    return intervals

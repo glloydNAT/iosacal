@@ -101,19 +101,8 @@ calibrated_curve = asarray(calibrated_list)
 sample_curve = normpdf(calibrated_curve[:,0], f_m, sigma_m)
 
 # Confidence intervals
-hpd68 = list(alsuren_hpd(calibrated_curve,0.318))
-confid68 = []
-for i in hpd68:
-    if (i + 5 not in hpd68) ^ (i - 5 not in hpd68): # ^ is the XOR operator
-        confid68.append(i)
-intervals68 = asarray(confid68).reshape(len(confid68)/2,2)
-
-hpd95 = list(alsuren_hpd(calibrated_curve,0.046))
-confid95 = []
-for i in hpd95:
-    if (i + 5 not in hpd95) ^ (i - 5 not in hpd95): # ^ is the XOR operator
-        confid95.append(i)
-intervals95 = asarray(confid95).reshape(len(confid95)/2,2)
+intervals68 = alsuren_hpd(calibrated_curve,0.318)
+intervals95 = alsuren_hpd(calibrated_curve,0.046)
 
 ## Plots
 
@@ -126,7 +115,7 @@ plt.text(0.5, 0.95,r'$STEKO: %d \pm %d BP$' % (f_m, sigma_m),
      verticalalignment='center',
      transform = ax1.transAxes,
      bbox=dict(facecolor='white', alpha=0.9, edgecolor=None))
-plt.text(0.95, 0.90,'68.2%% probability\n%s' % str(confid68),
+plt.text(0.95, 0.90,'68.2%% probability\n%s' % str(intervals68),
      horizontalalignment='center',
      verticalalignment='center',
      transform = ax1.transAxes,
