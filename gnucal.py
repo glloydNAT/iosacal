@@ -29,7 +29,7 @@ from numpy import array, asarray, sort
 from optparse import OptionParser, OptionGroup
 from pylab import normpdf
 
-from hpd import alsuren_hpd
+from hpd import alsuren_hpd, prev_next
 
 
 ## OptionParser
@@ -74,9 +74,9 @@ if not (options.date and options.sigma):
 
 intcal04 = open('intcal04.14c') # Atmospheric data from Reimer et al (2004);
 intlines = intcal04.readlines()
-intnotcomment = [ l for l in intlines if not l.startswith('#')]
+intnotcomment = [ l for l in intlines if not '#' in l]
 intcal04 = reader(intnotcomment, skipinitialspace = True)
-intarray = asarray(list(intcal04))
+intarray = array(list(intcal04)).astype('d') # calibration curve values are floats
 
 
 def calibrate(f_m, sigma_m, f_t, sigma_t):
@@ -89,13 +89,13 @@ f_m, sigma_m = options.date, options.sigma
 
 calibrated_list = []
 for i in intarray:
-    f_t, sigma_t = map(float, i[1:3])
+    f_t, sigma_t = i[1:3]
     ca = calibrate(f_m, sigma_m, f_t, sigma_t)
     # FIXME this treshold value is completely arbitrary
-    if ca > 0.00000001:
-        calibrated_list.append((int(i[0]),ca))
-
+    if ca > 0.000000001:
+        calibrated_list.append((i[0],ca))
 calibrated_curve = asarray(calibrated_list)
+print calibrated_curve[:,1].max() / 0.00000001
 
 # Normal (Gaussian) curve, used only for plotting!
 sample_curve = normpdf(calibrated_curve[:,0], f_m, sigma_m)
@@ -103,6 +103,7 @@ sample_curve = normpdf(calibrated_curve[:,0], f_m, sigma_m)
 # Confidence intervals
 intervals68 = alsuren_hpd(calibrated_curve,0.318)
 intervals95 = alsuren_hpd(calibrated_curve,0.046)
+#print prev_next(15000.0, intarray)
 
 ## Plots
 
@@ -168,8 +169,8 @@ ax3.set_axis_off()
 
 # Calibration Curve
 
-mlab_low  = [ float(n[1]) - float(n[2]) for n in intarray ]
-mlab_high = [ float(n[1]) + float(n[2]) for n in intarray ]
+mlab_low  = [ n[1] - n[2] for n in intarray ]
+mlab_high = [ n[1] + n[2] for n in intarray ]
 
 xs, ys = mlab.poly_between(intarray[:,0],
                            mlab_low,
