@@ -22,6 +22,16 @@
 from copy import copy
 from numpy import asarray
 
+def prev_next(n, array):
+    '''Finds the interval between the given value and it previous and next.'''
+    
+    a = array[:,0].copy()
+    a.sort()
+    i = a.searchsorted(n)
+    prev = abs(a[i-1] - a[i])
+    next = abs(a[i+1] - a[i])
+    return prev, next
+
 def alsuren_hpd(x, alpha):
     
     z = x.copy()
