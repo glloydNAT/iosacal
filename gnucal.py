@@ -120,7 +120,7 @@ plt.text(0.5, 0.95,r'$STEKO: %d \pm %d BP$' % (f_m, sigma_m),
      verticalalignment='center',
      transform = ax1.transAxes,
      bbox=dict(facecolor='white', alpha=0.9, edgecolor=None))
-plt.text(0.95, 0.90,'68.2%% probability\n%s' % str(intervals68),
+plt.text(0.95, 0.90,'68.2%% probability\n%s\n95.4%% probability\n%s' % (str(intervals68), str(intervals95)),
      horizontalalignment='center',
      verticalalignment='center',
      transform = ax1.transAxes,
