@@ -176,6 +176,9 @@ xs, ys = mlab.poly_between(intarray[:,0],
                            mlab_low,
                            mlab_high)
 ax1.fill(xs, ys, 'b', alpha=0.3)
+# FIXME the following values 10 and 5 are arbitrary and could be probably
+# drawn from the f_m value itself, while preserving their ratio
+ax1.set_ybound(f_m - sigma_m * 15, f_m + sigma_m * 5)
 
 # Confidence intervals
 
