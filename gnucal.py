@@ -98,7 +98,7 @@ calibrated_curve = asarray(calibrated_list)
 print calibrated_curve[:,1].max() / 0.00000001
 
 # Normal (Gaussian) curve, used only for plotting!
-sample_curve = normpdf(calibrated_curve[:,0], f_m, sigma_m)
+sample_curve = normpdf(intarray[:,0], f_m, sigma_m)
 
 # Confidence intervals
 intervals68 = alsuren_hpd(calibrated_curve,0.318)
@@ -153,13 +153,13 @@ ax2.set_axis_off()
 ax3 = plt.twiny(ax1)
 ax3.fill(
     sample_curve,
-    calibrated_curve[:,0],
+    intarray[:,0],
     'r',
     alpha=0.3
     )
 ax3.plot(
     sample_curve,
-    calibrated_curve[:,0],
+    intarray[:,0],
     'r',
     alpha=0.3,
     label='Radiocarbon determination (BP)'
