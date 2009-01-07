@@ -75,11 +75,12 @@ if not (options.date and options.sigma):
 
 ## GNUCal itself
 
-intcal04 = open('intcal04.14c') # Atmospheric data from Reimer et al (2004);
-intlines = intcal04.readlines()
-intnotcomment = [ l for l in intlines if not '#' in l]
-intcal04 = reader(intnotcomment, skipinitialspace = True)
-intarray = array(list(intcal04)).astype('d') # calibration curve values are floats
+calibration_file = open(options.curve) # Atmospheric data from Reimer et al (2004);
+calibration_lines = calibration_file.readlines()
+calibration_title = calibration_lines[0].replace('#','')
+calibration_data = [ l for l in calibration_lines if not '#' in l]
+calibration_list = reader(calibration_data, skipinitialspace = True)
+calibration_array = array(list(calibration_list)).astype('d') # calibration curve values are floats
 
 
 def calibrate(f_m, sigma_m, f_t, sigma_t):
@@ -91,7 +92,7 @@ def calibrate(f_m, sigma_m, f_t, sigma_t):
 f_m, sigma_m = options.date, options.sigma
 
 calibrated_list = []
-for i in intarray:
+for i in calibration_array:
     f_t, sigma_t = i[1:3]
     ca = calibrate(f_m, sigma_m, f_t, sigma_t)
     # FIXME this treshold value is completely arbitrary
@@ -101,12 +102,12 @@ calibrated_curve = asarray(calibrated_list)
 print calibrated_curve[:,1].max() / 0.00000001
 
 # Normal (Gaussian) curve, used only for plotting!
-sample_curve = normpdf(intarray[:,0], f_m, sigma_m)
+sample_curve = normpdf(calibration_array[:,0], f_m, sigma_m)
 
 # Confidence intervals
 intervals68 = alsuren_hpd(calibrated_curve,0.318)
 intervals95 = alsuren_hpd(calibrated_curve,0.046)
-#print prev_next(15000.0, intarray)
+#print prev_next(15000.0, calibration_array)
 
 ## Plots
 
@@ -124,7 +125,7 @@ plt.text(0.95, 0.90,'68.2%% probability\n%s' % str(intervals68),
      verticalalignment='center',
      transform = ax1.transAxes,
      bbox=dict(facecolor='white', alpha=0.9, edgecolor=None))
-plt.text(0.0, 1.0,'GNUCal 0.1; IntCal04 atmospheric curve (Reimer et al. 2004)',
+plt.text(0.0, 1.0,'GNUCal v0.1; %s' % calibration_title,
      horizontalalignment='left',
      verticalalignment='center',
      transform = ax1.transAxes,
@@ -156,26 +157,26 @@ ax2.set_axis_off()
 ax3 = plt.twiny(ax1)
 ax3.fill(
     sample_curve,
-    intarray[:,0],
+    calibration_array[:,0],
     'r',
     alpha=0.3
     )
 ax3.plot(
     sample_curve,
-    intarray[:,0],
+    calibration_array[:,0],
     'r',
     alpha=0.3,
     label='Radiocarbon determination (BP)'
     )
-ax3.set_xbound(min(sample_curve),max(sample_curve)*3)
+ax3.set_xbound(min(sample_curve),max(sample_curve)*4)
 ax3.set_axis_off()
 
 # Calibration Curve
 
-mlab_low  = [ n[1] - n[2] for n in intarray ]
-mlab_high = [ n[1] + n[2] for n in intarray ]
+mlab_low  = [ n[1] - n[2] for n in calibration_array ]
+mlab_high = [ n[1] + n[2] for n in calibration_array ]
 
-xs, ys = mlab.poly_between(intarray[:,0],
+xs, ys = mlab.poly_between(calibration_array[:,0],
                            mlab_low,
                            mlab_high)
 ax1.fill(xs, ys, 'b', alpha=0.3)
