@@ -37,20 +37,23 @@ from hpd import alsuren_hpd, prev_next
 usage = "usage: %prog [option] arg1 [option] arg2 ..."
 
 parser = OptionParser(usage = usage)
-parser.add_option("-d",
-                "--date",
+parser.add_option("-d", "--date",
                 action="store",
                 type="int",
                 dest="date",
                 help="non calibrated radiocarbon BP date for sample",
                 metavar="DATE")
-parser.add_option("-s",
-                "--sigma",
+parser.add_option("-s", "--sigma",
                 action="store",
                 type="int",
                 dest="sigma",
                 help="standard deviation for date",
                 metavar="SIGMA")
+parser.add_option("-c", "--curve",
+                  default="intcal04.14c",
+                  type="str",
+                  dest="curve",
+                  help="calibration curve to be used [default: %default]")
 group = OptionGroup(parser, 'BP or BC/AD output',
                     'Use these two mutually exclusive options to choose which '
                     'type of dates you like as output.')
