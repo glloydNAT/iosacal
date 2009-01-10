@@ -25,11 +25,17 @@ from numpy import asarray
 def prev_next(n, array):
     '''Finds the interval between the given value and it previous and next.'''
     
-    a = array[:,0].copy()
+    a = asarray(array)
     a.sort()
     i = a.searchsorted(n)
-    prev = abs(a[i-1] - a[i])
-    next = abs(a[i+1] - a[i])
+    try:
+        prev = a[i-1]
+    except IndexError:
+        prev = None
+    try:
+        next = a[i+1]
+    except IndexError:
+        next = None
     return prev, next
 
 def alsuren_hpd(x, alpha):
@@ -44,7 +50,7 @@ def alsuren_hpd(x, alpha):
     hpd = list(x[ts_ix,0])
     confid = list()
     for i in hpd:
-        if (i + 5 not in hpd) ^ (i - 5 not in hpd): # ^ is the XOR operator
+        if (prev_next(i,hpd)[0] not in hpd) ^ (prev_next(i,hpd)[1] not in hpd): # ^ is the XOR operator
             confid.append(i)
     intervals = asarray(confid).reshape(len(confid)/2,2)
     return intervals
