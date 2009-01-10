@@ -23,6 +23,7 @@ import sys
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 
+from copy import copy
 from csv import reader
 from math import pow, exp, sqrt
 from numpy import array, asarray, sort
@@ -72,7 +73,6 @@ parser.add_option_group(group)
 if not (options.date and options.sigma):
     sys.exit('Please provide date and standard deviation')
 
-
 ## GNUCal itself
 
 calibration_file = open(options.curve) # Atmospheric data from Reimer et al (2004);
@@ -101,7 +101,24 @@ for i in calibration_array:
 calibrated_curve = asarray(calibrated_list)
 
 # Normal (Gaussian) curve, used only for plotting!
-sample_curve = normpdf(calibration_array[:,0], f_m, sigma_m)
+sample_interval = calibration_array[:,0].copy()
+sample_curve = normpdf(sample_interval, f_m, sigma_m)
+
+# Before the output and confidence intervals, check if we want AD or BP years
+if options.BP is False:
+    print("Using BC/AD years")
+    calibrated_curve[:,0] *= -1
+    calibrated_curve[:,0] += 1950
+    calibration_array[:,0] *= -1
+    calibration_array[:,0] += 1950
+    if min(calibrated_curve[:,0]) < 0 and max(calibrated_curve[:,0]) > 0:
+        ad_bp_label = "BC/AD"
+    elif min(calibrated_curve[:,0]) < 0 and max(calibrated_curve[:,0]) < 0:
+        ad_bp_label = "BC"
+    elif min(calibrated_curve[:,0]) > 0 and max(calibrated_curve[:,0]) > 0:
+        ad_bp_label = "AD"
+else:
+    ad_bp_label = "BP"
 
 # Confidence intervals
 intervals68 = alsuren_hpd(calibrated_curve,0.318)
@@ -111,7 +128,7 @@ intervals95 = alsuren_hpd(calibrated_curve,0.046)
 
 ax1 = plt.subplot(111)
 plt.title("Radiocarbon Age vs Calibrated Age")
-plt.xlabel("Calibrated date (BP)")
+plt.xlabel("Calibrated date (%s)" % ad_bp_label)
 plt.ylabel("Radiocarbon determination (BP)")
 plt.text(0.5, 0.95,r'$STEKO: %d \pm %d BP$' % (f_m, sigma_m),
      horizontalalignment='center',
@@ -155,13 +172,13 @@ ax2.set_axis_off()
 ax3 = plt.twiny(ax1)
 ax3.fill(
     sample_curve,
-    calibration_array[:,0],
+    sample_interval,
     'r',
     alpha=0.3
     )
 ax3.plot(
     sample_curve,
-    calibration_array[:,0],
+    sample_interval,
     'r',
     alpha=0.3,
     label='Radiocarbon determination (BP)'
