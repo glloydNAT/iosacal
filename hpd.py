@@ -22,12 +22,17 @@
 from copy import copy
 from numpy import asarray
 
-def prev(n, array):
-    '''Find interval between given value and its previous, inside array.'''
-    
+def findsorted(n, array):
+    '''Return sorted array and index of n inside array.'''
     a = asarray(array)
     a.sort()
     i = a.searchsorted(n)
+    return a, i
+
+def prev(n, array):
+    '''Find interval between n and its previous, inside array.'''
+    
+    a,i = findsorted(n, array)
     if i-1 < 0:
         prev = None
     else:
@@ -35,32 +40,34 @@ def prev(n, array):
     return prev
 
 def next(n, array):
-    '''Find interval between given value and its next, inside array.'''
+    '''Find interval between n and its next, inside array.'''
     
-    a = asarray(array)
-    a.sort()
-    i = a.searchsorted(n)
+    a,i = findsorted(n, array)
     try:
         next = a[i+1]
     except IndexError:
         next = None
     return next
 
-def alsuren_hpd(x, alpha):
+def alsuren_hpd(calibrated_curve, alpha):
     
-    z = x.copy()
-    zz = z[z[:,1].argsort(),][::-1]   # sort rows by second column, return indices
-    c = zz[:,1].cumsum()
-    c /= c[-1]
-    threshold_index = c.searchsorted(1-alpha)
-    threshold_p = zz[threshold_index][1]
-    ts_ix = x[:,1]>threshold_p
-    hpd = list(x[ts_ix,0])
-    confid = list()
+    hpd_curve = calibrated_curve.copy()
+    # sort rows by second column in inverse order
+    hpd_sorted = hpd_curve[hpd_curve[:,1].argsort(),][::-1]
+    hpd_cumsum = hpd_sorted[:,1].cumsum()
+    # normalised values
+    hpd_cumsum /= hpd_cumsum[-1]
+    
+    threshold_index = hpd_cumsum.searchsorted(1 - alpha)
+    threshold_p = hpd_sorted[threshold_index][1]
+    threshold_index = calibrated_curve[:,1] > threshold_p
+    hpd = list(hpd_curve[threshold_index,0])
+    
+    confidence_intervals = list()
+    
     for i in hpd:
         # ^ is the XOR operator
-        if (prev(i,z[:,0]) not in hpd) ^ (next(i,z[:,0]) not in hpd):
-            confid.append(i)
-    intervals = asarray(confid).reshape(len(confid)/2,2)
-    return intervals
+        if (prev(i,hpd_curve[:,0]) not in hpd) ^ (next(i,hpd_curve[:,0]) not in hpd):
+            confidence_intervals.append(i)
+    return asarray(confidence_intervals).reshape(len(confidence_intervals)/2,2)
 
