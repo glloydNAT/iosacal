@@ -8,7 +8,9 @@
 GNUCal is a radiocarbon (14C) calibration program.
 
 It is intended as a free-as-in-freedom replacement for programs
-like OxCal and CALIB.
+like OxCal and CALIB and it can run on any platform where the Python
+interpreter is available, including all GNU/Linux distributions, MacOS X and
+other UNIX operating systems, and Microsoft Windows.
 
 How is works
 ============
@@ -25,14 +27,14 @@ options.
   -d DATE, --date=DATE  non calibrated radiocarbon BP date for sample
   -s SIGMA, --sigma=SIGMA
                         standard deviation for date
+  -c CURVE, --curve=CURVE
+                        calibration curve to be used [default: intcal04.14c]
 
 The typical usage is therefore like::
 
     ./gnucal.py -d 790 -s 60
 
-The result is saved into the image named ``image_790±60.png``,
-which qualifies as a unique name in the context of radiocarbon
-dating.
+The result is saved into the image named ``image_790±60.png``.
 
 What is does
 ============
@@ -68,7 +70,7 @@ Generation of plots is done through, Matplotlib_, another Python
 library built on top of NumPy.
 
 Development is tracked with git_, the stupid content tracker, and the
-public code repository is hosted at http://repo.or.cz/w/gnucal.git .
+public code repository is hosted at <http://repo.or.cz/w/gnucal.git>.
 
 .. _Python: http://www.python.org/
 .. _NumPy: http://numpy.scipy.org/
@@ -91,3 +93,4 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNUCal. If not, see <http://www.gnu.org/licenses/>.
+
