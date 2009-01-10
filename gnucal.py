@@ -126,23 +126,46 @@ intervals95 = alsuren_hpd(calibrated_curve,0.046)
 
 ## Plots
 
+# Prepare year strings for quality labels
+
+def ad_bc_prefix(year):
+    '''Return a string with BC/AD prefix and the given year.'''
+    if options.BP is False:
+        if year > 0:
+            return "AD %d" % year
+        else:
+            return "BC %d" % year
+    else:
+        return "BP %d" % year
+
+string68 = ''
+for i in intervals68:
+    i = tuple(map(ad_bc_prefix,i))
+    string68 += ' %s - %s\n' % i
+
+string95 = ''
+for i in intervals95:
+    i = tuple(map(ad_bc_prefix,i))
+    string95 += ' %s - %s\n' % i
+
+# Define the legend and descriptive text
+
 ax1 = plt.subplot(111)
-plt.title("Radiocarbon Age vs Calibrated Age")
 plt.xlabel("Calibrated date (%s)" % ad_bp_label)
 plt.ylabel("Radiocarbon determination (BP)")
-plt.text(0.5, 0.95,r'$STEKO: %d \pm %d BP$' % (f_m, sigma_m),
+plt.text(0.5, 0.95,r'STEKO: $%d \pm %d BP$' % (f_m, sigma_m),
      horizontalalignment='center',
      verticalalignment='center',
      transform = ax1.transAxes,
-     bbox=dict(facecolor='white', alpha=0.9, edgecolor=None))
-plt.text(0.95, 0.90,'68.2%% probability\n%s\n95.4%% probability\n%s' % (str(intervals68), str(intervals95)),
+     bbox=dict(facecolor='white', alpha=0.9, lw=0))
+plt.text(0.85, 0.85,'68.2%% probability\n%s\n95.4%% probability\n%s' % (str(string68), str(string95)),
      horizontalalignment='center',
      verticalalignment='center',
      transform = ax1.transAxes,
-     bbox=dict(facecolor='white', alpha=0.9, edgecolor=None))
+     bbox=dict(facecolor='white', alpha=0.9, lw=0))
 plt.text(0.0, 1.0,'GNUCal v0.1; %s' % calibration_title,
      horizontalalignment='left',
-     verticalalignment='center',
+     verticalalignment='bottom',
      transform = ax1.transAxes,
      size=7,
      bbox=dict(facecolor='white', alpha=0.9, lw=0))
