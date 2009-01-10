@@ -22,21 +22,29 @@
 from copy import copy
 from numpy import asarray
 
-def prev_next(n, array):
-    '''Finds the interval between the given value and it previous and next.'''
+def prev(n, array):
+    '''Find interval between given value and its previous, inside array.'''
+    
+    a = asarray(array)
+    a.sort()
+    i = a.searchsorted(n)
+    if i-1 < 0:
+        prev = None
+    else:
+        prev = a[i-1]
+    return prev
+
+def next(n, array):
+    '''Find interval between given value and its next, inside array.'''
     
     a = asarray(array)
     a.sort()
     i = a.searchsorted(n)
     try:
-        prev = a[i-1]
-    except IndexError:
-        prev = None
-    try:
         next = a[i+1]
     except IndexError:
         next = None
-    return prev, next
+    return next
 
 def alsuren_hpd(x, alpha):
     
@@ -50,7 +58,9 @@ def alsuren_hpd(x, alpha):
     hpd = list(x[ts_ix,0])
     confid = list()
     for i in hpd:
-        if (prev_next(i,hpd)[0] not in hpd) ^ (prev_next(i,hpd)[1] not in hpd): # ^ is the XOR operator
+        # ^ is the XOR operator
+        if (prev(i,z[:,0]) not in hpd) ^ (next(i,z[:,0]) not in hpd):
             confid.append(i)
     intervals = asarray(confid).reshape(len(confid)/2,2)
     return intervals
+

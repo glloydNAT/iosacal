@@ -29,7 +29,7 @@ from numpy import array, asarray, sort
 from optparse import OptionParser, OptionGroup
 from pylab import normpdf
 
-from hpd import alsuren_hpd, prev_next
+from hpd import alsuren_hpd
 
 
 ## OptionParser
@@ -99,7 +99,6 @@ for i in calibration_array:
     if ca > 0.000000001:
         calibrated_list.append((i[0],ca))
 calibrated_curve = asarray(calibrated_list)
-print calibrated_curve[:,1].max() / 0.00000001
 
 # Normal (Gaussian) curve, used only for plotting!
 sample_curve = normpdf(calibration_array[:,0], f_m, sigma_m)
@@ -107,7 +106,6 @@ sample_curve = normpdf(calibration_array[:,0], f_m, sigma_m)
 # Confidence intervals
 intervals68 = alsuren_hpd(calibrated_curve,0.318)
 intervals95 = alsuren_hpd(calibrated_curve,0.046)
-#print prev_next(15000.0, calibration_array)
 
 ## Plots
 
