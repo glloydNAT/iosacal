@@ -178,7 +178,7 @@ plt.text(0.0, 1.0,'GNUCal v0.1; %s' % calibration_title,
 ax2 = plt.twinx()
 ax2.fill(
     calibrated_curve[:,0],
-    calibrated_curve[:,1],
+    calibrated_curve[:,1] + max(calibrated_curve[:,1])*0.3, # imitate OxCal
     'k',
     alpha=0.3,
     label='Calendar Age'
@@ -224,12 +224,14 @@ ax1.fill(xs, ys, 'b', alpha=0.3)
 # drawn from the f_m value itself, while preserving their ratio
 ax1.set_ybound(f_m - sigma_m * 15, f_m + sigma_m * 5)
 
-# Confidence intervals
+# Confidence intervals, OxCal style
 
-for i in intervals95:
-    ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
 for i in intervals68:
-    ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.8)
+    ax1.axvspan(min(i), max(i), ymin=0.05, ymax=0.07, facecolor='none', alpha=0.8)
+    ax1.axvspan(min(i), max(i), ymin=0.069, ymax=0.071, facecolor='w', lw=0)
+for i in intervals95:
+    ax1.axvspan(min(i), max(i), ymin=0.025, ymax=0.045, facecolor='none', alpha=0.8)
+    ax1.axvspan(min(i), max(i), ymin=0.044, ymax=0.046, facecolor='w', lw=0)
 
 plt.savefig('image_%d±%d.png' %(f_m, sigma_m))
 
