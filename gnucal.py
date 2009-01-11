@@ -23,14 +23,13 @@ import sys
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 
-from copy import copy
 from csv import reader
 from math import pow, exp, sqrt
 from numpy import array, asarray, sort
 from optparse import OptionParser, OptionGroup
 from pylab import normpdf
 
-from hpd import alsuren_hpd
+from hpd import alsuren_hpd, confidence_percent
 
 
 ## OptionParser
@@ -125,31 +124,6 @@ intervals68 = alsuren_hpd(calibrated_curve,0.318)
 intervals95 = alsuren_hpd(calibrated_curve,0.046)
 
 
-def confidence_percent(years):
-    percent_curve = calibrated_curve.copy()
-    percent_cumsum = percent_curve.copy()
-
-    percent_curve[:,1] /= percent_curve[:,1].sum()
-    percent_curve.sort(0)
-    
-    year1_index = percent_curve[:,0].searchsorted([years[0]])
-    year2_index = percent_curve[:,0].searchsorted([years[1]])
-    indices = [ percent_curve[:,0].searchsorted([year]) for year in years ]
-    indices.sort()
-    min_year, max_year = indices
-    
-    confidence_interval = percent_curve[min_year:max_year,1]
-    confidence_interval1 = percent_cumsum[min_year:max_year,1]
-    percent_result = confidence_interval.sum()
-    percent_result1 = confidence_interval1.sum()
-    return percent_result, percent_result1
-
-for y in intervals68:
-    print y, confidence_percent(y)
-
-for y in intervals95:
-    print y, confidence_percent(y)
-
 ## Plots
 
 # Prepare year strings for quality labels
@@ -165,14 +139,16 @@ def ad_bc_prefix(year):
         return "BP %d" % year
 
 string68 = ''
-for i in intervals68:
-    i = tuple(map(ad_bc_prefix,i))
-    string68 += ' %s - %s\n' % i
+for ys in intervals68:
+    i = map(ad_bc_prefix,ys)
+    percent = confidence_percent(ys, calibrated_curve) * 100
+    string68 += ' %s (%2.1f %%) %s\n' % (i[0], percent, i[1])
 
 string95 = ''
-for i in intervals95:
-    i = tuple(map(ad_bc_prefix,i))
-    string95 += ' %s - %s\n' % i
+for ys in intervals95:
+    i = map(ad_bc_prefix,ys)
+    percent = confidence_percent(ys, calibrated_curve) * 100
+    string95 += ' %s (%2.1f %%) %s\n' % (i[0], percent, i[1])
 
 # Define the legend and descriptive text
 
@@ -184,8 +160,8 @@ plt.text(0.5, 0.95,r'STEKO: $%d \pm %d BP$' % (f_m, sigma_m),
      verticalalignment='center',
      transform = ax1.transAxes,
      bbox=dict(facecolor='white', alpha=0.9, lw=0))
-plt.text(0.85, 0.85,'68.2%% probability\n%s\n95.4%% probability\n%s' % (str(string68), str(string95)),
-     horizontalalignment='center',
+plt.text(0.75, 0.80,'68.2%% probability\n%s\n95.4%% probability\n%s' % (str(string68), str(string95)),
+     horizontalalignment='left',
      verticalalignment='center',
      transform = ax1.transAxes,
      bbox=dict(facecolor='white', alpha=0.9, lw=0))

@@ -50,7 +50,7 @@ def next(n, array):
     return next
 
 def alsuren_hpd(calibrated_curve, alpha):
-    
+    '''Return year spans that have the required Highest Probability Density.'''
     hpd_curve = calibrated_curve.copy()
     # sort rows by second column in inverse order
     hpd_sorted = hpd_curve[hpd_curve[:,1].argsort(),][::-1]
@@ -70,4 +70,21 @@ def alsuren_hpd(calibrated_curve, alpha):
         if (prev(i,hpd_curve[:,0]) not in hpd) ^ (next(i,hpd_curve[:,0]) not in hpd):
             confidence_intervals.append(i)
     return asarray(confidence_intervals).reshape(len(confidence_intervals)/2,2)
+
+
+def confidence_percent(years, array):
+    '''Return HPD as percent value for a given span of years.'''
+    percent_curve = array.copy()
+    percent_curve[:,1] /= percent_curve[:,1].sum()
+    percent_sorted = percent_curve[percent_curve[:,0].argsort(),]
+    
+    year1_index = percent_sorted[:,0].searchsorted([years[0]])
+    year2_index = percent_sorted[:,0].searchsorted([years[1]])
+    indices = [ percent_sorted[:,0].searchsorted([year]) for year in years ]
+    indices.sort()
+    min_year, max_year = indices
+    
+    confidence_interval = percent_sorted[min_year:max_year+1,1]
+    percent_result = confidence_interval.sum()
+    return percent_result
 
