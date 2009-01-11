@@ -124,6 +124,32 @@ else:
 intervals68 = alsuren_hpd(calibrated_curve,0.318)
 intervals95 = alsuren_hpd(calibrated_curve,0.046)
 
+
+def confidence_percent(years):
+    percent_curve = calibrated_curve.copy()
+    percent_cumsum = percent_curve.copy()
+
+    percent_curve[:,1] /= percent_curve[:,1].sum()
+    percent_curve.sort(0)
+    
+    year1_index = percent_curve[:,0].searchsorted([years[0]])
+    year2_index = percent_curve[:,0].searchsorted([years[1]])
+    indices = [ percent_curve[:,0].searchsorted([year]) for year in years ]
+    indices.sort()
+    min_year, max_year = indices
+    
+    confidence_interval = percent_curve[min_year:max_year,1]
+    confidence_interval1 = percent_cumsum[min_year:max_year,1]
+    percent_result = confidence_interval.sum()
+    percent_result1 = confidence_interval1.sum()
+    return percent_result, percent_result1
+
+for y in intervals68:
+    print y, confidence_percent(y)
+
+for y in intervals95:
+    print y, confidence_percent(y)
+
 ## Plots
 
 # Prepare year strings for quality labels
