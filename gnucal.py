@@ -25,7 +25,7 @@ import matplotlib.mlab as mlab
 
 from csv import reader
 from math import pow, exp, sqrt
-from numpy import array, asarray, sort
+from numpy import array, asarray, sort, linspace, repeat, concatenate
 from optparse import OptionParser, OptionGroup
 from pylab import normpdf
 
@@ -81,6 +81,18 @@ calibration_data = [ l for l in calibration_lines if not '#' in l]
 calibration_list = reader(calibration_data, skipinitialspace = True)
 calibration_array = array(list(calibration_list)).astype('d') # calibration curve values are floats
 
+# "interpolate" calibration curve
+calibration_linspace = linspace(
+                max(calibration_array[:,0]),
+                min(calibration_array[:,0]),
+                max(calibration_array[:,0]) - min(calibration_array[:,0]) + 1
+                )
+
+calibration_repeats = calibration_array[:,1].repeat(5)[:-4]
+calibration_array2 = concatenate((calibration_linspace, calibration_repeats), axis=1).transpose().reshape(2,-1)
+print calibration_array
+print "@@@@@@@@@@@@@@@òòòò"
+print calibration_array2
 
 def calibrate(f_m, sigma_m, f_t, sigma_t):
     '''Formula as defined by Bronk Ramsey 2008 doi: 10.1111/j.1475-4754.2008.00394.x'''
