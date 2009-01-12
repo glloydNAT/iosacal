@@ -89,10 +89,14 @@ calibration_linspace = linspace(
                 )
 
 calibration_repeats = calibration_array[:,1].repeat(5)[:-4]
-calibration_array2 = concatenate((calibration_linspace, calibration_repeats), axis=1).transpose().reshape(2,-1)
-print calibration_array
-print "@@@@@@@@@@@@@@@òòòò"
-print calibration_array2
+calibration_repeats2 = calibration_array[:,2].repeat(5)[:-4]
+calibration_array = array([calibration_linspace, calibration_repeats, calibration_repeats2]).transpose()
+
+#print calibration_array.shape, calibration_array.ndim
+#print ""
+#print "@@@@@@@@@@@@@@@@@@@@@"
+#print ""
+#print calibration_array2
 
 def calibrate(f_m, sigma_m, f_t, sigma_t):
     '''Formula as defined by Bronk Ramsey 2008 doi: 10.1111/j.1475-4754.2008.00394.x'''
