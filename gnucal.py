@@ -25,9 +25,10 @@ import matplotlib.mlab as mlab
 
 from csv import reader
 from math import pow, exp, sqrt
-from numpy import array, asarray, sort, linspace, repeat, concatenate
+from numpy import arange, array, asarray, sort, flipud
 from optparse import OptionParser, OptionGroup
 from pylab import normpdf
+from scipy.interpolate import splrep, splev
 
 from hpd import alsuren_hpd, confidence_percent
 
@@ -81,22 +82,28 @@ calibration_data = [ l for l in calibration_lines if not '#' in l]
 calibration_list = reader(calibration_data, skipinitialspace = True)
 calibration_array = array(list(calibration_list)).astype('d') # calibration curve values are floats
 
-# "interpolate" calibration curve
-calibration_linspace = linspace(
-                max(calibration_array[:,0]),
-                min(calibration_array[:,0]),
-                max(calibration_array[:,0]) - min(calibration_array[:,0]) + 1
-                )
 
-calibration_repeats = calibration_array[:,1].repeat(5)[:-4]
-calibration_repeats2 = calibration_array[:,2].repeat(5)[:-4]
-calibration_array = array([calibration_linspace, calibration_repeats, calibration_repeats2]).transpose()
+# Interpolate with scipy.interpolate
 
-#print calibration_array.shape, calibration_array.ndim
-#print ""
-#print "@@@@@@@@@@@@@@@@@@@@@"
-#print ""
-#print calibration_array2
+# XXX splrep & co. only accept ascending values ?
+calibration_array = flipud(calibration_array)
+
+calibration_arange = arange(calibration_array[0,0],calibration_array[-1,0],1)
+
+calibration_spline_0 = splrep(calibration_array[:,0],calibration_array[:,1],s=0)
+calibration_interpolated_0 = splev(calibration_arange, calibration_spline_0)
+
+calibration_spline_1 = splrep(calibration_array[:,0],calibration_array[:,2],s=0)
+calibration_interpolated_1 = splev(calibration_arange, calibration_spline_1)
+
+calibration_array2 = array([calibration_arange,
+                            calibration_interpolated_0,
+                            calibration_interpolated_1]
+                            ).transpose()
+
+calibration_array = flipud(calibration_array2) # see above XXX
+
+# calibration formula
 
 def calibrate(f_m, sigma_m, f_t, sigma_t):
     '''Formula as defined by Bronk Ramsey 2008 doi: 10.1111/j.1475-4754.2008.00394.x'''
