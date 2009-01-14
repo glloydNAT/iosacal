@@ -28,7 +28,12 @@ from math import pow, exp, sqrt
 from numpy import arange, array, asarray, sort, flipud
 from optparse import OptionParser, OptionGroup
 from pylab import normpdf
-from scipy.interpolate import splrep, splev
+try:
+    from scipy.interpolate import interp1d
+except ImportError:
+    HAS_SCIPY = False
+else:
+    HAS_SCIPY = True
 
 from hpd import alsuren_hpd, confidence_percent
 
@@ -55,6 +60,12 @@ parser.add_option("-c", "--curve",
                   type="str",
                   dest="curve",
                   help="calibration curve to be used [default: %default]")
+parser.add_option("-i", "--interpolate",
+                  default=False,
+                  action="store_true",
+                  dest="interpolate",
+                  help="interpolate calibration curve to obtain fine-grained"
+                       "dating intervals [default: %default]")
 group = OptionGroup(parser, 'BP or BC/AD output',
                     'Use these two mutually exclusive options to choose which '
                     'type of dates you like as output.')
@@ -85,23 +96,29 @@ calibration_array = array(list(calibration_list)).astype('d') # calibration curv
 
 # Interpolate with scipy.interpolate
 
-# XXX splrep & co. only accept ascending values ?
-calibration_array = flipud(calibration_array)
+if options.interpolate is True and HAS_SCIPY is True:
+    print("Interpolating calibration curve...")
+    # XXX interp1d only accepts ascending values
+    calibration_array = flipud(calibration_array)
+    
+    calibration_arange = arange(calibration_array[0,0],calibration_array[-1,0],1)
+    
+    calibration_spline_0 = interp1d(calibration_array[:,0],calibration_array[:,1])
+    calibration_interpolated_0 = calibration_spline_0(calibration_arange)
+    
+    calibration_spline_1 = interp1d(calibration_array[:,0],calibration_array[:,2])
+    calibration_interpolated_1 = calibration_spline_1(calibration_arange)
+    
+    calibration_array2 = array([calibration_arange,
+                                calibration_interpolated_0,
+                                calibration_interpolated_1]
+                                ).transpose()
+    
+    calibration_array = flipud(calibration_array2) # see above XXX
 
-calibration_arange = arange(calibration_array[0,0],calibration_array[-1,0],1)
+elif options.interpolate is True and HAS_SCIPY is False:
+    print("SciPy isn't available. The calibration curve won't be interpolated.")
 
-calibration_spline_0 = splrep(calibration_array[:,0],calibration_array[:,1],s=0)
-calibration_interpolated_0 = splev(calibration_arange, calibration_spline_0)
-
-calibration_spline_1 = splrep(calibration_array[:,0],calibration_array[:,2],s=0)
-calibration_interpolated_1 = splev(calibration_arange, calibration_spline_1)
-
-calibration_array2 = array([calibration_arange,
-                            calibration_interpolated_0,
-                            calibration_interpolated_1]
-                            ).transpose()
-
-calibration_array = flipud(calibration_array2) # see above XXX
 
 # calibration formula
 
