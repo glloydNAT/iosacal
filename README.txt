@@ -138,7 +138,7 @@ curves and calibrated samples.
 
 Generation of plots is done through, Matplotlib_, another Python
 library built on top of NumPy. The optional interpolation is done through
-the SciPy_ ``interpolate.interp1d``_ method.
+the SciPy_ `interpolate.interp1d`_ method.
 
 Installing the above packages is needed in order to run GNUCal on your
 computer. SciPy is optional but highly recommended: without it interpolation
@@ -154,7 +154,7 @@ development, which is much appreciated.
 .. _NumPy: http://numpy.scipy.org/
 .. _Matplotlib: http://matplotlib.sourceforge.net/
 .. _SciPy: http://www.scipy.org/
-.. _`interpolate.interp1d``: http://docs.scipy.org/doc/scipy/reference/tutorial/interpolate.html
+.. _`interpolate.interp1d`: http://docs.scipy.org/doc/scipy/reference/tutorial/interpolate.html
 .. _git: http://git.or.cz/
 
 License
