@@ -29,12 +29,50 @@ options.
                         standard deviation for date
   -c CURVE, --curve=CURVE
                         calibration curve to be used [default: intcal04.14c]
+  -o, --oxcal           draw plots more OxCal-like looking [default: False]
+  -i, --interpolate     interpolate calibration curve to obtain fine-
+                        grained dating intervals [default: False]
+  -n NAME, --name=NAME  name of output image [default: gnucal]
+
+  BP or BC/AD output:
+    Use these two mutually exclusive options to choose which type of dates
+    you like as output.
+
+    --bp                express date in Calibrated BP Age (default action)
+    --ad                express date in Calibrated BC/AD Calendar Age
+
+
+Basic usage
+-----------
 
 The typical usage is therefore like::
 
     ./gnucal.py -d 790 -s 60
 
-The result is saved into the image named ``image_790±60.png``.
+The result is saved into the image named ``gnucal_790±60.png``.
+
+Multiple dates
+--------------
+
+It is also possible to give GNUCal more than one radiocarbon determination,
+to see how 2 or more samples relate between themselves.
+
+To use the multiple dates feature, just pass more ``-d`` and ``-s`` options
+on the command line::
+
+    ./gnucal.py -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45
+
+It's also useful to use the ``-n`` option to give a name to the image, and
+also a title to the plot::
+
+    ./gnucal.py -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -n "Donetta"
+
+Please note that currently if GNUCal is provided more than one sample, you will
+get only the multiple plot. If you want single plots, just pass samples one by
+one.
+
+    This will change in future revisions, allowing users to choose between
+    getting single, multiple or both plots.
 
 What is does
 ============
@@ -42,7 +80,7 @@ What is does
 GNUCal is based on currently available calibration methods, like
 those described in [RAM2008]_.
 
-GNUCal takes a radiocarbon determination, typically composed by a
+GNUCal takes a radiocarbon de    ./gnucal.py -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45termination, typically composed by a
 date in years BP (before present, i.e. before 1950 AD) and a standard
 deviation measure.
 
