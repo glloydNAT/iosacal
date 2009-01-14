@@ -66,7 +66,7 @@ How it is implemented
 GNUCal is written in the Python_ programming language, and it makes
 heavy use of the NumPy_ library for the internal management of data.
 
-Generation of plots is done through, Matplotlib_, another Python
+Generation of plots is done through Matplotlib_, another Python
 library built on top of NumPy.
 
 Development is tracked with git_, the stupid content tracker, and the
