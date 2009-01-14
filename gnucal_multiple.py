@@ -54,6 +54,11 @@ parser.add_option("-c", "--curve",
                   type="str",
                   dest="curve",
                   help="calibration curve to be used [default: %default]")
+parser.add_option("-n", "--name",
+                  default="gnucal",
+                  type="str",
+                  dest="name",
+                  help="name of output image [default: %default]")
 group = OptionGroup(parser, 'BP or BC/AD output',
                     'Use these two mutually exclusive options to choose which '
                     'type of dates you like as output.')
@@ -128,10 +133,6 @@ if options.BP is False:
 else:
     ad_bp_label = "BP"
 
-# Confidence intervals
-#intervals68 = alsuren_hpd(calibrated_curve,0.318)
-#intervals95 = alsuren_hpd(calibrated_curve,0.046)
-
 min_year, max_year = (3000, -50000)
 
 for calibrated_curve in multiple_curves:
@@ -149,13 +150,14 @@ for calibrated_curve in multiple_curves:
 # Define the legend and descriptive text
 
 fig = plt.figure(1)
+plt.suptitle("%s" % options.name )
 for n, calibrated_curve in enumerate(multiple_curves):
     fignum = 1 + n
     numrows = len(multiple_curves)
     ax1 = fig.add_subplot(numrows,1,fignum)
-
+    
     # Calendar Age
-
+    
     ax1.fill(
         calibrated_curve[:,0],
         calibrated_curve[:,1],
@@ -171,13 +173,34 @@ for n, calibrated_curve in enumerate(multiple_curves):
         )
     ax1.set_ybound(min(calibrated_curve[:,1]),max(calibrated_curve[:,1])*2)
     ax1.set_xbound(min_year, max_year)
+    #ax1.set_axis_off()
+    
+    # Confidence intervals
+    intervals68 = alsuren_hpd(calibrated_curve,0.318)
+    intervals95 = alsuren_hpd(calibrated_curve,0.046)
+    
+    for i in intervals95:
+        ax1.axvspan(min(i), max(i), ymin=0.6, ymax=0.7, facecolor='k', alpha=0.5)
+    for i in intervals68:
+        ax1.axvspan(min(i), max(i), ymin=0.6, ymax=0.7, facecolor='k', alpha=0.8)
 
-# Confidence intervals
+plt.savefig('image_%s.png' % options.name )
 
-#for i in intervals95:
-#    ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
-#for i in intervals68:
-#    ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.8)
+fig = plt.figure(2)
+plt.suptitle("%s" % options.name )
+for n, calibrated_curve in enumerate(multiple_curves):
+    fignum = 1 + n
+    numrows = len(multiple_curves)
+    ax1 = fig.add_subplot(numrows,1,fignum)
+    ax1.set_xbound(min_year, max_year)
+    # Confidence intervals
+    intervals68 = alsuren_hpd(calibrated_curve,0.318)
+    intervals95 = alsuren_hpd(calibrated_curve,0.046)
+    
+    for i in intervals95:
+        ax1.axvspan(min(i), max(i), ymin=0.1, ymax=0.9, facecolor='k', alpha=0.5)
+    for i in intervals68:
+        ax1.axvspan(min(i), max(i), ymin=0.1, ymax=0.9, facecolor='k', alpha=0.8)
 
-plt.savefig('image_%d±%d.png' %(f_m, sigma_m))
+plt.savefig('intervals_%s.png' % options.name )
 
