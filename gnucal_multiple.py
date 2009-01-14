@@ -124,16 +124,8 @@ if options.BP is False:
     for calibrated_curve in multiple_curves:
         calibrated_curve[:,0] *= -1
         calibrated_curve[:,0] += 1950
-        if min(calibrated_curve[:,0]) < 0 and max(calibrated_curve[:,0]) > 0:
-            ad_bp_label = "BC/AD"
-        elif min(calibrated_curve[:,0]) < 0 and max(calibrated_curve[:,0]) < 0:
-            ad_bp_label = "BC"
-        elif min(calibrated_curve[:,0]) > 0 and max(calibrated_curve[:,0]) > 0:
-            ad_bp_label = "AD"
-else:
-    ad_bp_label = "BP"
 
-min_year, max_year = (3000, -50000)
+min_year, max_year = (50000, -50000)
 
 for calibrated_curve in multiple_curves:
     if min_year < min(calibrated_curve[:,0]):
@@ -145,12 +137,23 @@ for calibrated_curve in multiple_curves:
     else:
         max_year = max(calibrated_curve[:,0])
 
+if options.BP is False:
+    if min_year < 0 and max_year > 0:
+        ad_bp_label = "BC/AD"
+    elif min_year < 0 and max_year < 0:
+        ad_bp_label = "BC"
+    elif min_year > 0 and max_year > 0:
+        ad_bp_label = "AD"
+else:
+    ad_bp_label = "BP"
+
 ## Plots
 
 # Define the legend and descriptive text
 
 fig = plt.figure(1)
 plt.suptitle("%s" % options.name )
+plt.suptitle("Calibrated date (%s)" % ad_bp_label, y = 0.05)
 for n, calibrated_curve in enumerate(multiple_curves):
     fignum = 1 + n
     numrows = len(multiple_curves)
@@ -198,9 +201,9 @@ for n, calibrated_curve in enumerate(multiple_curves):
     intervals95 = alsuren_hpd(calibrated_curve,0.046)
     
     for i in intervals95:
-        ax1.axvspan(min(i), max(i), ymin=0.1, ymax=0.9, facecolor='k', alpha=0.5)
+        ax1.axvspan(min(i), max(i), ymin=0.25, ymax=0.75, facecolor='k', alpha=0.5)
     for i in intervals68:
-        ax1.axvspan(min(i), max(i), ymin=0.1, ymax=0.9, facecolor='k', alpha=0.8)
+        ax1.axvspan(min(i), max(i), ymin=0.25, ymax=0.75, facecolor='k', alpha=0.8)
 
-plt.savefig('intervals_%s.png' % options.name )
+#plt.savefig('intervals_%s.png' % options.name )
 
