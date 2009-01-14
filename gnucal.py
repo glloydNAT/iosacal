@@ -54,6 +54,11 @@ parser.add_option("-c", "--curve",
                   type="str",
                   dest="curve",
                   help="calibration curve to be used [default: %default]")
+parser.add_option("-o", "--oxcal",
+                  action="store_true",
+                  dest="oxcal",
+                  default=False,
+                  help="draw plots more OxCal-like looking [default: %default]")
 group = OptionGroup(parser, 'BP or BC/AD output',
                     'Use these two mutually exclusive options to choose which '
                     'type of dates you like as output.')
