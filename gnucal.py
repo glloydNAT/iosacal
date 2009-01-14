@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # filename: gnucal.py
 # Copyright 2008 Stefano Costa <steko@iosa.it>
-# 
+#
 # This file is part of GNUCal.
 
 # GNUCal is free software: you can redistribute it and/or modify
@@ -44,13 +44,13 @@ usage = "usage: %prog [option] arg1 [option] arg2 ..."
 
 parser = OptionParser(usage = usage)
 parser.add_option("-d", "--date",
-                action="store",
+                action="append",
                 type="int",
                 dest="date",
                 help="non calibrated radiocarbon BP date for sample",
                 metavar="DATE")
 parser.add_option("-s", "--sigma",
-                action="store",
+                action="append",
                 type="int",
                 dest="sigma",
                 help="standard deviation for date",
@@ -70,7 +70,12 @@ parser.add_option("-i", "--interpolate",
                   action="store_true",
                   dest="interpolate",
                   help="interpolate calibration curve to obtain fine-grained"
-                       "dating intervals [default: %default]")
+                       " dating intervals [default: %default]")
+parser.add_option("-n", "--name",
+                  default="gnucal",
+                  type="str",
+                  dest="name",
+                  help="name of output image [default: %default]")
 group = OptionGroup(parser, 'BP or BC/AD output',
                     'Use these two mutually exclusive options to choose which '
                     'type of dates you like as output.')
@@ -98,32 +103,30 @@ calibration_data = [ l for l in calibration_lines if not '#' in l]
 calibration_list = reader(calibration_data, skipinitialspace = True)
 calibration_array = array(list(calibration_list)).astype('d') # calibration curve values are floats
 
-
 # Interpolate with scipy.interpolate
 
 if options.interpolate is True and HAS_SCIPY is True:
     print("Interpolating calibration curve...")
     # XXX interp1d only accepts ascending values
     calibration_array = flipud(calibration_array)
-    
+
     calibration_arange = arange(calibration_array[0,0],calibration_array[-1,0],1)
-    
+
     calibration_spline_0 = interp1d(calibration_array[:,0],calibration_array[:,1])
     calibration_interpolated_0 = calibration_spline_0(calibration_arange)
-    
+
     calibration_spline_1 = interp1d(calibration_array[:,0],calibration_array[:,2])
     calibration_interpolated_1 = calibration_spline_1(calibration_arange)
-    
+
     calibration_array2 = array([calibration_arange,
                                 calibration_interpolated_0,
                                 calibration_interpolated_1]
                                 ).transpose()
-    
+
     calibration_array = flipud(calibration_array2) # see above XXX
 
 elif options.interpolate is True and HAS_SCIPY is False:
     print("SciPy isn't available. The calibration curve won't be interpolated.")
-
 
 # calibration formula
 
@@ -133,16 +136,22 @@ def calibrate(f_m, sigma_m, f_t, sigma_t):
     P_t = ( exp( - pow(f_m - f_t, 2 ) / ( 2 * ( sigma_sum ) ) ) / sqrt(sigma_sum) )
     return P_t
 
-f_m, sigma_m = options.date, options.sigma
+input_dates = asarray([options.date, options.sigma]).transpose()
 
-calibrated_list = []
-for i in calibration_array:
-    f_t, sigma_t = i[1:3]
-    ca = calibrate(f_m, sigma_m, f_t, sigma_t)
-    # FIXME this treshold value is completely arbitrary
-    if ca > 0.000000001:
-        calibrated_list.append((i[0],ca))
-calibrated_curve = asarray(calibrated_list)
+multiple_curves = []
+for d in input_dates:
+    f_m, sigma_m = tuple(d)
+    calibrated_list = []
+    for i in calibration_array:
+        f_t, sigma_t = i[1:3]
+        ca = calibrate(f_m, sigma_m, f_t, sigma_t)
+        # FIXME this treshold value is completely arbitrary
+        if ca > 0.000000001:
+            calibrated_list.append((i[0],ca))
+    calibrated_curve = asarray(calibrated_list)
+    del calibrated_list
+    multiple_curves.append(calibrated_curve)
+    del calibrated_curve
 
 # Normal (Gaussian) curve, used only for plotting!
 sample_interval = calibration_array[:,0].copy()
@@ -151,155 +160,213 @@ sample_curve = normpdf(sample_interval, f_m, sigma_m)
 # Before the output and confidence intervals, check if we want AD or BP years
 if options.BP is False:
     print("Using BC/AD years")
-    calibrated_curve[:,0] *= -1
-    calibrated_curve[:,0] += 1950
     calibration_array[:,0] *= -1
     calibration_array[:,0] += 1950
-    if min(calibrated_curve[:,0]) < 0 and max(calibrated_curve[:,0]) > 0:
+
+    for calibrated_curve in multiple_curves:
+        calibrated_curve[:,0] *= -1
+        calibrated_curve[:,0] += 1950
+
+min_year, max_year = (50000, -50000)
+
+for calibrated_curve in multiple_curves:
+    if min_year < min(calibrated_curve[:,0]):
+        pass
+    else:
+        min_year = min(calibrated_curve[:,0])
+    if max_year > max(calibrated_curve[:,0]):
+        pass
+    else:
+        max_year = max(calibrated_curve[:,0])
+
+if options.BP is False:
+    if min_year < 0 and max_year > 0:
         ad_bp_label = "BC/AD"
-    elif min(calibrated_curve[:,0]) < 0 and max(calibrated_curve[:,0]) < 0:
+    elif min_year < 0 and max_year < 0:
         ad_bp_label = "BC"
-    elif min(calibrated_curve[:,0]) > 0 and max(calibrated_curve[:,0]) > 0:
+    elif min_year > 0 and max_year > 0:
         ad_bp_label = "AD"
 else:
     ad_bp_label = "BP"
 
-# Confidence intervals
-intervals68 = alsuren_hpd(calibrated_curve,0.318)
-intervals95 = alsuren_hpd(calibrated_curve,0.046)
+if len(multiple_curves) > 1:
 
+    # Define the legend and descriptive text
 
-## Plots
+    fig = plt.figure(1)
+    plt.suptitle("%s" % options.name )
+    plt.suptitle("Calibrated date (%s)" % ad_bp_label, y = 0.05)
+    for n, calibrated_curve in enumerate(multiple_curves):
+        fignum = 1 + n
+        numrows = len(multiple_curves)
+        ax1 = fig.add_subplot(numrows,1,fignum)
 
-# Prepare year strings for quality labels
+        # Calendar Age
 
-def ad_bc_prefix(year):
-    '''Return a string with BC/AD prefix and the given year.'''
-    if options.BP is False:
-        if year > 0:
-            return "AD %d" % year
+        ax1.fill(
+            calibrated_curve[:,0],
+            calibrated_curve[:,1],
+            'k',
+            alpha=0.3,
+            label='Calendar Age'
+            )
+        ax1.plot(
+            calibrated_curve[:,0],
+            calibrated_curve[:,1],
+            'k',
+            alpha=0
+            )
+        ax1.set_ybound(min(calibrated_curve[:,1]),max(calibrated_curve[:,1])*2)
+        ax1.set_xbound(min_year, max_year)
+        #ax1.set_axis_off()
+
+        # Confidence intervals
+        intervals68 = alsuren_hpd(calibrated_curve,0.318)
+        intervals95 = alsuren_hpd(calibrated_curve,0.046)
+
+        for i in intervals95:
+            ax1.axvspan(min(i), max(i), ymin=0.6, ymax=0.7, facecolor='k', alpha=0.5)
+        for i in intervals68:
+            ax1.axvspan(min(i), max(i), ymin=0.6, ymax=0.7, facecolor='k', alpha=0.8)
+
+    plt.savefig('image_%s.png' % options.name )
+
+else:
+    calibrated_curve = multiple_curves[0]
+    # Confidence intervals
+    intervals68 = alsuren_hpd(calibrated_curve,0.318)
+    intervals95 = alsuren_hpd(calibrated_curve,0.046)
+
+    ## Plots
+
+    # Prepare year strings for quality labels
+
+    def ad_bc_prefix(year):
+        '''Return a string with BC/AD prefix and the given year.'''
+        if options.BP is False:
+            if year > 0:
+                return "AD %d" % year
+            else:
+                return "BC %d" % year
         else:
-            return "BC %d" % year
+            return "BP %d" % year
+
+    string68 = ''
+    for ys in intervals68:
+        i = map(ad_bc_prefix,ys)
+        percent = confidence_percent(ys, calibrated_curve) * 100
+        string68 += ' %s (%2.1f %%) %s\n' % (i[0], percent, i[1])
+
+    string95 = ''
+    for ys in intervals95:
+        i = map(ad_bc_prefix,ys)
+        percent = confidence_percent(ys, calibrated_curve) * 100
+        string95 += ' %s (%2.1f %%) %s\n' % (i[0], percent, i[1])
+
+    # Define the legend and descriptive text
+
+    ax1 = plt.subplot(111)
+    plt.xlabel("Calibrated date (%s)" % ad_bp_label)
+    plt.ylabel("Radiocarbon determination (BP)")
+    plt.text(0.5, 0.95,r'STEKO: $%d \pm %d BP$' % (f_m, sigma_m),
+         horizontalalignment='center',
+         verticalalignment='center',
+         transform = ax1.transAxes,
+         bbox=dict(facecolor='white', alpha=0.9, lw=0))
+    plt.text(0.75, 0.80,'68.2%% probability\n%s\n95.4%% probability\n%s' % (str(string68), str(string95)),
+         horizontalalignment='left',
+         verticalalignment='center',
+         transform = ax1.transAxes,
+         bbox=dict(facecolor='white', alpha=0.9, lw=0))
+    plt.text(0.0, 1.0,'GNUCal v0.1; %s' % calibration_title,
+         horizontalalignment='left',
+         verticalalignment='bottom',
+         transform = ax1.transAxes,
+         size=7,
+         bbox=dict(facecolor='white', alpha=0.9, lw=0))
+
+    # Calendar Age
+
+    ax2 = plt.twinx()
+
+    if options.oxcal is True:
+        ax2.fill(
+            calibrated_curve[:,0],
+            calibrated_curve[:,1] + max(calibrated_curve[:,1])*0.3, # imitate OxCal
+            'k',
+            alpha=0.3,
+            label='Calendar Age'
+            )
+        ax2.plot(
+            calibrated_curve[:,0],
+            calibrated_curve[:,1],
+            'k',
+            alpha=0
+            )
     else:
-        return "BP %d" % year
+        ax2.fill(
+            calibrated_curve[:,0],
+            calibrated_curve[:,1],
+            'k',
+            alpha=0.3,
+            label='Calendar Age'
+            )
+        ax2.plot(
+            calibrated_curve[:,0],
+            calibrated_curve[:,1],
+            'k',
+            alpha=0
+            )
 
-string68 = ''
-for ys in intervals68:
-    i = map(ad_bc_prefix,ys)
-    percent = confidence_percent(ys, calibrated_curve) * 100
-    string68 += ' %s (%2.1f %%) %s\n' % (i[0], percent, i[1])
+    ax2.set_ybound(min(calibrated_curve[:,1]),max(calibrated_curve[:,1])*3)
+    ax2.set_axis_off()
 
-string95 = ''
-for ys in intervals95:
-    i = map(ad_bc_prefix,ys)
-    percent = confidence_percent(ys, calibrated_curve) * 100
-    string95 += ' %s (%2.1f %%) %s\n' % (i[0], percent, i[1])
+    # Radiocarbon Age
 
-# Define the legend and descriptive text
-
-ax1 = plt.subplot(111)
-plt.xlabel("Calibrated date (%s)" % ad_bp_label)
-plt.ylabel("Radiocarbon determination (BP)")
-plt.text(0.5, 0.95,r'STEKO: $%d \pm %d BP$' % (f_m, sigma_m),
-     horizontalalignment='center',
-     verticalalignment='center',
-     transform = ax1.transAxes,
-     bbox=dict(facecolor='white', alpha=0.9, lw=0))
-plt.text(0.75, 0.80,'68.2%% probability\n%s\n95.4%% probability\n%s' % (str(string68), str(string95)),
-     horizontalalignment='left',
-     verticalalignment='center',
-     transform = ax1.transAxes,
-     bbox=dict(facecolor='white', alpha=0.9, lw=0))
-plt.text(0.0, 1.0,'GNUCal v0.1; %s' % calibration_title,
-     horizontalalignment='left',
-     verticalalignment='bottom',
-     transform = ax1.transAxes,
-     size=7,
-     bbox=dict(facecolor='white', alpha=0.9, lw=0))
-
-
-# Calendar Age
-
-ax2 = plt.twinx()
-
-if options.oxcal is True:
-    ax2.fill(
-        calibrated_curve[:,0],
-        calibrated_curve[:,1] + max(calibrated_curve[:,1])*0.3, # imitate OxCal
-        'k',
+    ax3 = plt.twiny(ax1)
+    ax3.fill(
+        sample_curve,
+        sample_interval,
+        'r',
+        alpha=0.3
+        )
+    ax3.plot(
+        sample_curve,
+        sample_interval,
+        'r',
         alpha=0.3,
-        label='Calendar Age'
+        label='Radiocarbon determination (BP)'
         )
-    ax2.plot(
-        calibrated_curve[:,0],
-        calibrated_curve[:,1],
-        'k',
-        alpha=0
-        )
-else:
-    ax2.fill(
-        calibrated_curve[:,0],
-        calibrated_curve[:,1],
-        'k',
-        alpha=0.3,
-        label='Calendar Age'
-        )
-    ax2.plot(
-        calibrated_curve[:,0],
-        calibrated_curve[:,1],
-        'k',
-        alpha=0
-        )
+    ax3.set_xbound(min(sample_curve),max(sample_curve)*4)
+    ax3.set_axis_off()
 
-ax2.set_ybound(min(calibrated_curve[:,1]),max(calibrated_curve[:,1])*3)
-ax2.set_axis_off()
+    # Calibration Curve
 
-# Radiocarbon Age
+    mlab_low  = [ n[1] - n[2] for n in calibration_array ]
+    mlab_high = [ n[1] + n[2] for n in calibration_array ]
 
-ax3 = plt.twiny(ax1)
-ax3.fill(
-    sample_curve,
-    sample_interval,
-    'r',
-    alpha=0.3
-    )
-ax3.plot(
-    sample_curve,
-    sample_interval,
-    'r',
-    alpha=0.3,
-    label='Radiocarbon determination (BP)'
-    )
-ax3.set_xbound(min(sample_curve),max(sample_curve)*4)
-ax3.set_axis_off()
+    xs, ys = mlab.poly_between(calibration_array[:,0],
+                               mlab_low,
+                               mlab_high)
+    ax1.fill(xs, ys, 'b', alpha=0.3)
+    # FIXME the following values 10 and 5 are arbitrary and could be probably
+    # drawn from the f_m value itself, while preserving their ratio
+    ax1.set_ybound(f_m - sigma_m * 15, f_m + sigma_m * 5)
 
-# Calibration Curve
+    # Confidence intervals
 
-mlab_low  = [ n[1] - n[2] for n in calibration_array ]
-mlab_high = [ n[1] + n[2] for n in calibration_array ]
+    if options.oxcal is True:
+        for i in intervals68:
+            ax1.axvspan(min(i), max(i), ymin=0.05, ymax=0.07, facecolor='none', alpha=0.8)
+            ax1.axvspan(min(i), max(i), ymin=0.069, ymax=0.071, facecolor='w', lw=0)
+        for i in intervals95:
+            ax1.axvspan(min(i), max(i), ymin=0.025, ymax=0.045, facecolor='none', alpha=0.8)
+            ax1.axvspan(min(i), max(i), ymin=0.044, ymax=0.046, facecolor='w', lw=0)
+    else:
+        for i in intervals68:
+            ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
+        for i in intervals95:
+            ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
 
-xs, ys = mlab.poly_between(calibration_array[:,0],
-                           mlab_low,
-                           mlab_high)
-ax1.fill(xs, ys, 'b', alpha=0.3)
-# FIXME the following values 10 and 5 are arbitrary and could be probably
-# drawn from the f_m value itself, while preserving their ratio
-ax1.set_ybound(f_m - sigma_m * 15, f_m + sigma_m * 5)
-
-# Confidence intervals
-
-if options.oxcal is True:
-    for i in intervals68:
-        ax1.axvspan(min(i), max(i), ymin=0.05, ymax=0.07, facecolor='none', alpha=0.8)
-        ax1.axvspan(min(i), max(i), ymin=0.069, ymax=0.071, facecolor='w', lw=0)
-    for i in intervals95:
-        ax1.axvspan(min(i), max(i), ymin=0.025, ymax=0.045, facecolor='none', alpha=0.8)
-        ax1.axvspan(min(i), max(i), ymin=0.044, ymax=0.046, facecolor='w', lw=0)
-else:
-    for i in intervals68:
-        ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
-    for i in intervals95:
-        ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
-
-plt.savefig('image_%d±%d.png' %(f_m, sigma_m))
+    plt.savefig('image_%d±%d.png' %(f_m, sigma_m))
 
