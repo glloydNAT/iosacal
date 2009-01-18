@@ -20,7 +20,7 @@
 
 from optparse import OptionParser, OptionGroup
 
-import core
+import core, plot
 
 
 usage = "usage: %prog [option] arg1 [option] arg2 ..."
@@ -38,6 +38,11 @@ parser.add_option("-s", "--sigma",
                 dest="sigma",
                 help="standard deviation for date",
                 metavar="SIGMA")
+parser.add_option("-p", "--plot",
+                  default=False,
+                  dest="plot",
+                  action="store_true",
+                  help="output results to graphic plot")
 parser.add_option("-c", "--curve",
                   default="intcal04.14c",
                   type="str",
@@ -77,11 +82,12 @@ parser.add_option_group(group)
 if not (options.date and options.sigma):
     sys.exit('Please provide date and standard deviation')
 
+if __name__ == '__main__':
+    cc = core.CalibrationCurve(options.curve, interpolate=options.interpolate)
 
-cc = core.CalibrationCurve(options.curve, interpolate=options.interpolate)
-
-for d, s in zip(options.date, options.sigma):
-    rs = core.RadiocarbonSample(d,s)
-    ca = core.CalibratedAge(cc, rs)
-    print ca.intervals95
+    for d, s in zip(options.date, options.sigma):
+        rs = core.RadiocarbonSample(d,s)
+        ca = core.CalibratedAge(cc, rs, BP=options.BP)
+        if options.plot is True:
+            plot.single_plot(ca,oxcal=options.oxcal)
 

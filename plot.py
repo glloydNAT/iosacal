@@ -1,0 +1,187 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+# filename: plot.py
+# Copyright 2009 Stefano Costa <steko@iosa.it>
+#
+# This file is part of GNUCal.
+
+# GNUCal is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# GNUCal is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with GNUCal.  If not, see <http://www.gnu.org/licenses/>.
+
+import matplotlib.pyplot as plt
+import matplotlib.mlab as mlab
+
+from pylab import normpdf
+
+import hpd
+
+
+def single_plot(calibrated_age,oxcal=False):
+    
+    calibrated_curve = calibrated_age.array
+    f_m, sigma_m = calibrated_age.f_m, calibrated_age.sigma_m
+    calibration_curve = calibrated_age.calibration_curve
+    intervals68 = calibrated_age.intervals68
+    intervals95 = calibrated_age.intervals95
+    BP = calibrated_age.BP
+
+    def ad_bc_prefix(year):
+        '''Return a string with BC/AD prefix and the given year.'''
+        if BP is False:
+            if year > 0:
+                return "AD %d" % year
+            else:
+                return "BC %d" % year
+        else:
+            return "BP %d" % year
+            
+    min_year, max_year = (50000, -50000)
+
+    if min_year < min(calibrated_curve[:,0]):
+        pass
+    else:
+        min_year = min(calibrated_curve[:,0])
+    if max_year > max(calibrated_curve[:,0]):
+        pass
+    else:
+        max_year = max(calibrated_curve[:,0])
+
+    if BP is False:
+        if min_year < 0 and max_year > 0:
+            ad_bp_label = "BC/AD"
+        elif min_year < 0 and max_year < 0:
+            ad_bp_label = "BC"
+        elif min_year > 0 and max_year > 0:
+            ad_bp_label = "AD"
+    else:
+        ad_bp_label = "BP"
+
+    string68 = ''
+    for ys in intervals68:
+        i = map(ad_bc_prefix,ys)
+        percent = hpd.confidence_percent(ys, calibrated_curve) * 100
+        string68 += ' %s (%2.1f %%) %s\n' % (i[0], percent, i[1])
+
+    string95 = ''
+    for ys in intervals95:
+        i = map(ad_bc_prefix,ys)
+        percent = hpd.confidence_percent(ys, calibrated_curve) * 100
+        string95 += ' %s (%2.1f %%) %s\n' % (i[0], percent, i[1])
+
+    ax1 = plt.subplot(111)
+    plt.xlabel("Calibrated date (%s)" % ad_bp_label)
+    plt.ylabel("Radiocarbon determination (BP)")
+    plt.text(0.5, 0.95,r'STEKO: $%d \pm %d BP$' % (f_m, sigma_m),
+         horizontalalignment='center',
+         verticalalignment='center',
+         transform = ax1.transAxes,
+         bbox=dict(facecolor='white', alpha=0.9, lw=0))
+    plt.text(0.75, 0.80,'68.2%% probability\n%s\n95.4%% probability\n%s' % (str(string68), str(string95)),
+         horizontalalignment='left',
+         verticalalignment='center',
+         transform = ax1.transAxes,
+         bbox=dict(facecolor='white', alpha=0.9, lw=0))
+    plt.text(0.0, 1.0,'GNUCal v0.1; %s' % calibration_curve.title,
+         horizontalalignment='left',
+         verticalalignment='bottom',
+         transform = ax1.transAxes,
+         size=7,
+         bbox=dict(facecolor='white', alpha=0.9, lw=0))
+
+    # Calendar Age
+
+    ax2 = plt.twinx()
+
+    if oxcal is True:
+        ax2.fill(
+            calibrated_curve[:,0],
+            calibrated_curve[:,1] + max(calibrated_curve[:,1])*0.3, # imitate OxCal
+            'k',
+            alpha=0.3,
+            label='Calendar Age'
+            )
+        ax2.plot(
+            calibrated_curve[:,0],
+            calibrated_curve[:,1],
+            'k',
+            alpha=0
+            )
+    else:
+        ax2.fill(
+            calibrated_curve[:,0],
+            calibrated_curve[:,1],
+            'k',
+            alpha=0.3,
+            label='Calendar Age'
+            )
+        ax2.plot(
+            calibrated_curve[:,0],
+            calibrated_curve[:,1],
+            'k',
+            alpha=0
+            )
+
+    ax2.set_ybound(min(calibrated_curve[:,1]),max(calibrated_curve[:,1])*3)
+    ax2.set_axis_off()
+
+    # Radiocarbon Age
+    sample_interval = calibration_curve.array[:,0].copy()
+    sample_curve = normpdf(sample_interval, f_m, sigma_m)
+
+    ax3 = plt.twiny(ax1)
+    ax3.fill(
+        sample_curve,
+        sample_interval,
+        'r',
+        alpha=0.3
+        )
+    ax3.plot(
+        sample_curve,
+        sample_interval,
+        'r',
+        alpha=0.3,
+        label='Radiocarbon determination (BP)'
+        )
+    ax3.set_xbound(min(sample_curve),max(sample_curve)*4)
+    ax3.set_axis_off()
+
+    # Calibration Curve
+    
+    mlab_low  = [ n[1] - n[2] for n in calibration_curve.array ]
+    mlab_high = [ n[1] + n[2] for n in calibration_curve.array ]
+
+    xs, ys = mlab.poly_between(calibration_curve.array[:,0],
+                               mlab_low,
+                               mlab_high)
+    ax1.fill(xs, ys, 'b', alpha=0.3)
+    # FIXME the following values 10 and 5 are arbitrary and could be probably
+    # drawn from the f_m value itself, while preserving their ratio
+    ax1.set_ybound(f_m - sigma_m * 15, f_m + sigma_m * 5)
+
+    # Confidence intervals
+
+    if oxcal is True:
+        for i in intervals68:
+            ax1.axvspan(min(i), max(i), ymin=0.05, ymax=0.07, facecolor='none', alpha=0.8)
+            ax1.axvspan(min(i), max(i), ymin=0.069, ymax=0.071, facecolor='w', lw=0)
+        for i in intervals95:
+            ax1.axvspan(min(i), max(i), ymin=0.025, ymax=0.045, facecolor='none', alpha=0.8)
+            ax1.axvspan(min(i), max(i), ymin=0.044, ymax=0.046, facecolor='w', lw=0)
+    else:
+        for i in intervals68:
+            ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
+        for i in intervals95:
+            ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
+
+    plt.savefig('image_%d±%d.png' %(f_m, sigma_m))
+
