@@ -31,6 +31,7 @@ def single_plot(calibrated_age,oxcal=False):
     calibrated_curve = calibrated_age.array
     f_m, sigma_m = calibrated_age.f_m, calibrated_age.sigma_m
     calibration_curve = calibrated_age.calibration_curve
+    calibration_curve_title = calibrated_age.calibration_curve_title
     intervals68 = calibrated_age.intervals68
     intervals95 = calibrated_age.intervals95
     BP = calibrated_age.BP
@@ -91,7 +92,7 @@ def single_plot(calibrated_age,oxcal=False):
          verticalalignment='center',
          transform = ax1.transAxes,
          bbox=dict(facecolor='white', alpha=0.9, lw=0))
-    plt.text(0.0, 1.0,'GNUCal v0.1; %s' % calibration_curve.title,
+    plt.text(0.0, 1.0,'GNUCal v0.1; %s' % calibration_curve_title,
          horizontalalignment='left',
          verticalalignment='bottom',
          transform = ax1.transAxes,
@@ -135,7 +136,7 @@ def single_plot(calibrated_age,oxcal=False):
     ax2.set_axis_off()
 
     # Radiocarbon Age
-    sample_interval = calibration_curve.array[:,0].copy()
+    sample_interval = calibration_curve[:,0].copy()
     sample_curve = normpdf(sample_interval, f_m, sigma_m)
 
     ax3 = plt.twiny(ax1)
@@ -157,10 +158,10 @@ def single_plot(calibrated_age,oxcal=False):
 
     # Calibration Curve
     
-    mlab_low  = [ n[1] - n[2] for n in calibration_curve.array ]
-    mlab_high = [ n[1] + n[2] for n in calibration_curve.array ]
+    mlab_low  = [ n[1] - n[2] for n in calibration_curve ]
+    mlab_high = [ n[1] + n[2] for n in calibration_curve ]
 
-    xs, ys = mlab.poly_between(calibration_curve.array[:,0],
+    xs, ys = mlab.poly_between(calibration_curve[:,0],
                                mlab_low,
                                mlab_high)
     ax1.fill(xs, ys, 'b', alpha=0.3)
@@ -184,4 +185,74 @@ def single_plot(calibrated_age,oxcal=False):
             ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
 
     plt.savefig('image_%d±%d.png' %(f_m, sigma_m))
+    fig = plt.gcf()
+    fig.clear()
 
+
+def multi_plot(calibrated_ages,name,oxcal=False):
+
+    # Define the legend and descriptive text
+
+    min_year, max_year = (50000, -50000)
+
+    for calibrated_curve in calibrated_ages:
+        if min_year < min(calibrated_curve.array[:,0]):
+            pass
+        else:
+            min_year = min(calibrated_curve.array[:,0])
+        if max_year > max(calibrated_curve.array[:,0]):
+            pass
+        else:
+            max_year = max(calibrated_curve.array[:,0])
+
+    if calibrated_ages[0].BP is False:
+        if min_year < 0 and max_year > 0:
+            ad_bp_label = "BC/AD"
+        elif min_year < 0 and max_year < 0:
+            ad_bp_label = "BC"
+        elif min_year > 0 and max_year > 0:
+            ad_bp_label = "AD"
+    else:
+        ad_bp_label = "BP"
+
+    fig = plt.figure(1)
+    plt.suptitle("%s" % name )
+    plt.suptitle("Calibrated date (%s)" % ad_bp_label, y = 0.05)
+
+    for n, calibrated_curve in enumerate(calibrated_ages):
+        fignum = 1 + n
+        numrows = len(calibrated_ages)
+        ax1 = fig.add_subplot(numrows,1,fignum)
+
+        # Calendar Age
+
+        ax1.fill(
+            calibrated_curve.array[:,0],
+            calibrated_curve.array[:,1],
+            'k',
+            alpha=0.3,
+            label='Calendar Age'
+            )
+        ax1.plot(
+            calibrated_curve.array[:,0],
+            calibrated_curve.array[:,1],
+            'k',
+            alpha=0
+            )
+        ax1.set_ybound(
+            min(calibrated_curve.array[:,1]),
+            max(calibrated_curve.array[:,1])*2
+            )
+        ax1.set_xbound(min_year, max_year)
+        #ax1.set_axis_off()
+
+        # Confidence intervals
+
+        for i in calibrated_curve.intervals95:
+            ax1.axvspan(min(i), max(i), ymin=0.6, ymax=0.7, facecolor='k', alpha=0.5)
+        for i in calibrated_curve.intervals68:
+            ax1.axvspan(min(i), max(i), ymin=0.6, ymax=0.7, facecolor='k', alpha=0.8)
+
+    plt.savefig('image_%s.png' % name )
+    fig = plt.gcf()
+    fig.clear()
