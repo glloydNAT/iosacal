@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # filename: gnucal.py
-# Copyright 2008 Stefano Costa <steko@iosa.it>
+# Copyright 2008-2009 Stefano Costa <steko@iosa.it>
 #
 # This file is part of GNUCal.
 

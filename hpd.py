@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # filename: hpd.py
-# Copyright 2008 Stefano Costa <steko@iosa.it>
+# Copyright 2008-2009 Stefano Costa <steko@iosa.it>
 # Copyright 2008 David Laban <alsuren@gmail.com>
 # 
 # This file is part of GNUCal.
