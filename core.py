@@ -104,11 +104,12 @@ class CalibratedAge(object):
     def __init__(self, calibration_curve, radiocarbon_sample, BP):
         self.f_m               = radiocarbon_sample.date
         self.sigma_m           = radiocarbon_sample.sigma
-        self.calibration_curve = calibration_curve
+        self.calibration_curve = calibration_curve.array.copy()
+        self.calibration_curve_title = calibration_curve.title
         self.BP = BP
         
         _calibrated_list = []
-        for i in self.calibration_curve.array:
+        for i in self.calibration_curve:
             f_t, sigma_t = i[1:3]
             ca = calibrate(self.f_m, self.sigma_m, f_t, sigma_t)
             # FIXME this treshold value is completely arbitrary
@@ -117,8 +118,8 @@ class CalibratedAge(object):
         self.array = asarray(_calibrated_list)
         
         if self.BP is False:
-            self.calibration_curve.array[:,0] *= -1
-            self.calibration_curve.array[:,0] += 1950
+            self.calibration_curve[:,0] *= -1
+            self.calibration_curve[:,0] += 1950
             self.array[:,0] *= -1
             self.array[:,0] += 1950
         
@@ -129,7 +130,6 @@ class CalibratedAge(object):
 
         self.intervals68 = alsuren_hpd(self.array,0.318)
         self.intervals95 = alsuren_hpd(self.array,0.046)
-
 
 class ConfidenceInterval(object):
     '''A confidence interval expressed as a probability percent.'''
