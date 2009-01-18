@@ -72,6 +72,10 @@ group0.add_option("-1", "--single",
                 default=True,
                 dest="single",
                 help="generate single plots for each sample")
+group0.add_option("--no-single",
+                action="store_false",
+                dest="single",
+                help="don't generate single plots for each sample")
 group0.add_option("-m", "--multiple",
                 action="store_true",
                 default=False,
