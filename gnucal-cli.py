@@ -64,9 +64,23 @@ parser.add_option("-n", "--name",
                   type="str",
                   dest="name",
                   help="name of output image [default: %default]")
+group0 = OptionGroup(parser, 'Single and multiple plots',
+                    'Use these two options when more than 1 sample is supplied'
+                    'to determine which output is generated.')
+group0.add_option("-1", "--single",
+                action="store_true",
+                default=True,
+                dest="single",
+                help="generate single plots for each sample")
+group0.add_option("-m", "--multiple",
+                action="store_true",
+                default=False,
+                dest="multi",
+                help="generate compoud plot with all samples")
+parser.add_option_group(group0)
 group = OptionGroup(parser, 'BP or BC/AD output',
                     'Use these two mutually exclusive options to choose which '
-                    'type of dates you like as output.')
+                    ' type of dates you like as output.')
 parser.set_defaults(BP=True)
 group.add_option("--bp",
                 action="store_true",
@@ -84,10 +98,18 @@ if not (options.date and options.sigma):
 
 if __name__ == '__main__':
     cc = core.CalibrationCurve(options.curve, interpolate=options.interpolate)
-
+    calibrated_ages = []
     for d, s in zip(options.date, options.sigma):
         rs = core.RadiocarbonSample(d,s)
         ca = core.CalibratedAge(cc, rs, BP=options.BP)
+        calibrated_ages.append(ca)
         if options.plot is True:
-            plot.single_plot(ca,oxcal=options.oxcal)
+            if options.single is True:
+                plot.single_plot(ca,oxcal=options.oxcal)
+            if options.multi is True:
+                plot.multi_plot(
+                                calibrated_ages,
+                                oxcal=options.oxcal,
+                                name=options.name
+                                )
 
