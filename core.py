@@ -93,12 +93,20 @@ class RadiocarbonSample(object):
 
 
 class CalibratedAge(object):
-    '''A calibrated radiocarbon age.'''
+    '''A calibrated radiocarbon age.
+    
+    This object is self-contained, it exposes both the calibration curve and
+    the radiocarbon sample objects so that they're available for output
+    interfaces directly.
+    
+    Also BP is an attribute of CalibratedAge.'''
 
-    def __init__(self, calibration_curve, radiocarbon_sample):
+    def __init__(self, calibration_curve, radiocarbon_sample, BP):
         self.f_m               = radiocarbon_sample.date
         self.sigma_m           = radiocarbon_sample.sigma
         self.calibration_curve = calibration_curve
+        self.BP = BP
+        
         _calibrated_list = []
         for i in self.calibration_curve.array:
             f_t, sigma_t = i[1:3]
@@ -107,6 +115,13 @@ class CalibratedAge(object):
             if ca > 0.000000001:
                 _calibrated_list.append((i[0],ca))
         self.array = asarray(_calibrated_list)
+        
+        if self.BP is False:
+            self.calibration_curve.array[:,0] *= -1
+            self.calibration_curve.array[:,0] += 1950
+            self.array[:,0] *= -1
+            self.array[:,0] += 1950
+        
         self._confidence_intervals()
 
     def _confidence_intervals(self):
