@@ -168,6 +168,7 @@ def single_plot(calibrated_age,oxcal=False):
     # FIXME the following values 10 and 5 are arbitrary and could be probably
     # drawn from the f_m value itself, while preserving their ratio
     ax1.set_ybound(f_m - sigma_m * 15, f_m + sigma_m * 5)
+    ax1.set_xbound(min(calibrated_curve[:,0]),max(calibrated_curve[:,0]))
 
     # Confidence intervals
 
