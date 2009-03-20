@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # filename: gnucal.py
-# Copyright 2008 Stefano Costa <steko@iosa.it>
+# Copyright 2008-2009 Stefano Costa <steko@iosa.it>
 #
 # This file is part of GNUCal.
 
@@ -96,7 +96,7 @@ if not (options.date and options.sigma):
 
 ## GNUCal itself
 
-calibration_file = open(options.curve) # Atmospheric data from Reimer et al (2004);
+calibration_file = open(options.curve)
 calibration_lines = calibration_file.readlines()
 calibration_title = calibration_lines[0].replace('#','')
 calibration_data = [ l for l in calibration_lines if not '#' in l]
