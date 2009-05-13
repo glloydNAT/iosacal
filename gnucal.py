@@ -20,7 +20,7 @@
 
 from optparse import OptionParser, OptionGroup
 
-import core, plot
+from gnucal import core, plot
 
 
 usage = "usage: %prog [option] arg1 [option] arg2 ..."
