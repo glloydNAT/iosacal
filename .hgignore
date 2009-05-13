@@ -1,0 +1,4 @@
+^docs/_build/
+\.py[co]$
+^(build|dist|gnucal\.egg-info)/
+.~$
