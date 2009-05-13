@@ -1,0 +1,31 @@
+:mod:`core` -- Core GNUCal library
+==================================
+
+.. module:: core
+    :synopsis: Perform radiocarbon calibration.
+.. moduleauthor:: Stefano Costa <steko@iosa.it>
+
+
+.. function:: calibrate(f_m, sigma_m, f_t, sigma_t):
+    
+    Calibration formula as defined by Bronk Ramsey 2008: 
+    doi: 10.1111/j.1475-4754.2008.00394.x
+
+    .. math:: P(t) \propto \frac{\exp \left[-\frac{(f_m - f(t))^2}{2 (\sigma^2_{fm} + \sigma^2_{f}(t))}\right]}{\sqrt{\sigma^2_{fm} + \sigma^2_{f}(t)}}
+
+
+.. class:: CalibrationCurve
+
+   .. method:: __init__(self, calibration_file, interpolate=False)
+   .. method:: _interpolate(self)
+   
+
+.. class:: RadiocarbonSample
+
+   A radiocarbon determination as issued by the lab instruments.
+
+   .. method:: __init__(self, date, sigma)
+
+
+.. class:: CalibratedAge
+

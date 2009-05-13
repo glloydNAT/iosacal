@@ -1,0 +1,104 @@
+.. GNUCal documentation master file, created by
+   sphinx-quickstart on Mon Apr 20 12:42:29 2009.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+GNUCal, a radiocarbon calibration program
+=========================================
+
+GNUCal is a radiocarbon (14C) calibration program. It can run natively
+on any platform where the Python interpreter is available, including
+all GNU/Linux distributions, MacOS X and other UNIX operating systems,
+and Microsoft Windows.
+
+.. image:: /images/image_790±60.png
+
+What does it do?
+----------------
+
+GNUCal takes a radiocarbon determination, typically composed by a date
+in years BP (before present, i.e. before 1950 AD) and a standard
+deviation measure, and outputs a calibrated age as a set of
+probability intervals either to the console or to an image with
+plots. The calibration method is based on current literature.
+
+GNUCal reads calibration curves in the common ``.14c`` format used
+also by OxCal and CALIB for better compatibility.
+
+Why GNUCal
+----------
+
+Most available programs for radiocarbon calibration, like OxCal, CALIB
+and others, are *freeware*. So, you don't have to pay for them, but
+you're not free to use and modify them as you need.
+
+This is the motivation behind GNUCal: creating a free-as-in-freedom
+radiocarbon calibration program, with a clean programming library,
+that enables experiments and integration in existing archaeological
+information systems.
+
+Get GNUCal
+----------
+
+GNUCal is still in its infancy. The 0.1 version will be released
+soon, but in the meantime you can get the development version from
+bitbucket_, either with the `complete project history`_ or as a
+simple `source archive`_.
+
+GNUCal isn't yet structured as a Python package, so you don't have to
+*install* it. Just extract the source into a folder and you'll be able
+to run it straight from there, using the command line interface.
+
+.. _bitbucket: http://bitbucket.org/steko/gnucal/
+.. _`complete project history`: http://bitbucket.org/steko/gnucal/overview/
+.. _`source archive`: http://bitbucket.org/steko/gnucal/get/tip.bz2
+
+
+Calibration resources
+---------------------
+
+There are some interesting websites to learn about radiocarbon
+calibration and related topics. Here's a brief list:
+
+
+- `IntCal04 Supplemental Data`_ to get the *calibration curves* in
+  ``.14c`` ASCII format
+- `Oxford Radiocarbon Accelerator Unit`_ contains a detailed
+  explanation of how to use C14 datings, calibration_ and the non-free
+  OxCal_ program, which is available also for Linux
+- CALIB_ is a radiocarbon calibration program. A command-line Linux
+  version is available (non-free software, but works well)
+- Radiocarbon_ is the main international journal of record for
+  research articles and date lists relevant to 14C and other
+  radioisotopes and techniques used in archaeological, geophysical,
+  oceanographic, and related dating
+- `IntCal04 Supplemental Data`_ including common used calibration curves
+
+.. _`IntCal04 Supplemental Data`: http://www.radiocarbon.org/IntCal04.htm
+.. _`Oxford Radiocarbon Accelerator Unit`: http://c14.arch.ox.ac.uk/
+.. _calibration: http://c14.arch.ox.ac.uk/embed.php?File=calibration.html
+.. _OxCal: http://c14.arch.ox.ac.uk/embed.php?File=oxcal.html
+.. _CALIB: http://calib.qub.ac.uk/calib/
+.. _Radiocarbon: http://radiocarbon.org/
+.. _`IntCal04 Supplemental Data`: http://www.radiocarbon.org/IntCal04.htm
+
+Site contents
+-------------
+
+.. toctree::
+   :glob:
+   :maxdepth: 1
+   
+   what
+   how
+   implementation
+   modules/index
+   license
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+

@@ -1,0 +1,29 @@
+Development
+===========
+
+GNUCal is written in the Python_ programming language, and it makes
+heavy use of the NumPy_ library for the internal management of calibration
+curves and calibrated samples. Calibration curves, radiocarbon dates
+and calibrated curves are handled internally as ``ndarray`` objects,
+making it ridiculously easy to manipulate and plot them.
+
+Generation of plots is done through Matplotlib_, another Python
+library built on top of NumPy. The optional interpolation is done through
+the SciPy_ `interpolate.interp1d`_ method.
+
+Installing the above packages is **needed** in order to run GNUCal on
+your computer. SciPy is optional but highly recommended: without it
+interpolation will be unavailable.
+
+Development is tracked with Mercurial_, a fast decentralized version
+control system. Installing *Mercurial* is not needed unless you want
+to participate in GNUCal's development: please contribute! The main
+development repository is on bitbucket_.
+
+.. _Python: http://www.python.org/
+.. _NumPy: http://numpy.scipy.org/
+.. _Matplotlib: http://matplotlib.sourceforge.net/
+.. _SciPy: http://www.scipy.org/
+.. _`interpolate.interp1d`: http://docs.scipy.org/doc/scipy/reference/tutorial/interpolate.html
+.. _Mercurial: http://www.selenic.com/mercurial/
+.. _bitbucket: http://bitbucket.org/steko/gnucal/overview/
