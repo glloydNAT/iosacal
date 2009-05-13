@@ -82,10 +82,11 @@ def single_plot(calibrated_age,oxcal=False):
         percent = hpd.confidence_percent(ys, calibrated_curve) * 100
         string95 += ' %s (%2.1f %%) %s\n' % (i[0], percent, i[1])
 
+    fig = plt.figure(figsize=(12,8))
     ax1 = plt.subplot(111)
     plt.xlabel("Calibrated date (%s)" % ad_bp_label)
     plt.ylabel("Radiocarbon determination (BP)")
-    plt.text(0.5, 0.95,r'STEKO: $%d \pm %d BP$' % (f_m, sigma_m),
+    plt.text(0.5, 0.95,r'EXAMPLE: $%d \pm %d BP$' % (f_m, sigma_m),
          horizontalalignment='center',
          verticalalignment='center',
          transform = ax1.transAxes,
@@ -188,7 +189,7 @@ def single_plot(calibrated_age,oxcal=False):
         for i in intervals95:
             ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
 
-    plt.savefig('image_%d±%d.png' %(f_m, sigma_m))
+    plt.savefig('image_%d±%d.pdf' %(f_m, sigma_m))
     fig = plt.gcf()
     fig.clear()
 
