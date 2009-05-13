@@ -12,7 +12,7 @@ Command line options
 
 GNUCal works from the command line. These are the available options.
 
-.. program:: gnucal-cli.py
+.. program:: gnucal.py
 
 .. cmdoption:: -h 
 
@@ -83,11 +83,11 @@ Basic usage
 
 GNUCal is not (yet) a complete Python package, so to use it, just extract files
 from the archive and ``cd gnucal``. The command line program is called
-``gnucal-cli.py``.
+``gnucal.py``.
 
 The typical usage is::
 
-    ./gnucal-cli.py -d 790 -s 60 -p
+    ./gnucal.py -d 790 -s 60 -p
 
 The result is saved into the image named ``gnucal_790±60.png``. It
 will look more or less like this:
@@ -107,7 +107,7 @@ sure it's in the same directory of the main executable.
 
 To specify a calibration curve, use the ``-c`` command line option::
 
-    ./gnucal-cli.py -d 790 -s 60 -p -c marine04.14c
+    ./gnucal.py -d 790 -s 60 -p -c marine04.14c
 
 We're working on a script to automate the download of such calibration
 data, or obtain an authorization for distributing the original files
@@ -127,7 +127,7 @@ particularly concerning probability intervals.
 
 Use the ``-i`` flag to activate interpolation::
 
-    ./gnucal-cli.py -d 790 -s 60 -p --ad -i
+    ./gnucal.py -d 790 -s 60 -p --ad -i
 
 GNUCal makes use of the **SciPy** library for interpolating calibration curves.
 Even if SciPy is not required for GNUCal's normal usage and interpolation is
@@ -149,7 +149,7 @@ to see how 2 or more samples relate between themselves.
 To use the multiple dates feature, just pass more ``-d`` and ``-s`` options
 on the command line::
 
-    ./gnucal-cli.py -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p
+    ./gnucal.py -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p
 
 The order in which values are passed to GNUCal matters, so the first
 date will be matched to the first standard deviation and so on.
@@ -157,12 +157,12 @@ date will be matched to the first standard deviation and so on.
 This way, you will get 3 different single plots. If you want to obtain
 also a compound plot, add the ``-m`` flag::
 
-    ./gnucal-cli.py -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p -m
+    ./gnucal.py -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p -m
 
 It's also useful to use the ``-n`` option to give a name to the image, and
 also a title to the plot::
 
-    ./gnucal-cli.py -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p -m -n "Donetta"
+    ./gnucal.py -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p -m -n "Donetta"
 
 
 .. image:: /images/image_Donetta.png
