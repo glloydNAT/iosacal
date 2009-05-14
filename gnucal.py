@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# filename: gnucal-cli.py
-# Copyright 2008 Stefano Costa <steko@iosa.it>
+# filename: gnucal.py
+# Copyright 2008-2009 Stefano Costa <steko@iosa.it>
 #
 # This file is part of GNUCal.
 
@@ -100,7 +100,7 @@ parser.add_option_group(group)
 if not (options.date and options.sigma):
     sys.exit('Please provide date and standard deviation')
 
-if __name__ == '__main__':
+def main():
     cc = core.CalibrationCurve(options.curve, interpolate=options.interpolate)
     calibrated_ages = []
     for d, s in zip(options.date, options.sigma):
@@ -117,3 +117,5 @@ if __name__ == '__main__':
                                 name=options.name
                                 )
 
+if __name__ == '__main__':
+    main()
