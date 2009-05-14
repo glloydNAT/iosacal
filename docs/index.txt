@@ -93,6 +93,7 @@ Site contents
    how
    implementation
    modules/index
+   glossary
    license
 
 Indices and tables

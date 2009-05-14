@@ -1,0 +1,16 @@
+==========
+ Glossary
+==========
+
+.. glossary::
+
+   :sorted:
+
+   sample
+      Each radiocarbon dating is based on the analysis of a sample of
+      archaeological material, like coal or bone. These days the
+      amount required is very little, just a few mg.
+
+   calibration curve
+      A calibration curve describes the relationship between the
+      theoretical decay and the actual one
