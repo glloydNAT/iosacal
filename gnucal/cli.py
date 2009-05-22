@@ -98,7 +98,7 @@ parser.add_option_group(group)
 
 (options, args) = parser.parse_args()
 if not (options.date and options.sigma):
-    sys.exit('Please provide date and standard deviation')
+    parser.error('Please provide date and standard deviation')
 
 def main():
     cc = core.CalibrationCurve(options.curve, interpolate=options.interpolate)
