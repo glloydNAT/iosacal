@@ -38,7 +38,8 @@ def calibrate(f_m, sigma_m, f_t, sigma_t):
     doi: 10.1111/j.1475-4754.2008.00394.x'''
 
     sigma_sum = pow(sigma_m, 2) + pow(sigma_t, 2)
-    P_t = ( exp( - pow(f_m - f_t, 2 ) / ( 2 * ( sigma_sum ) ) ) / sqrt(sigma_sum) )
+    P_t = ( exp( - pow(f_m - f_t, 2 ) /
+                   ( 2 * ( sigma_sum ) ) ) / sqrt(sigma_sum) )
     return P_t
 
 
