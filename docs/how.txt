@@ -29,7 +29,11 @@ GNUCal works from the command line. These are the available options.
 
 .. cmdoption:: -c <curve>, --curve=<curve>
 
-   Calibration curve to be used [default: ``intcal04.14c``]
+   Calibration curve to be used [default: ``intcal04``]
+
+   If you want to specify a different calibration curve provide the
+   curve canonical name in lower case (e.g. ``intcal04``, ``marine04``,
+   ``shcal04``).
 
 .. cmdoption:: -o, --oxcal
 
@@ -107,7 +111,7 @@ sure it's in the same directory of the main executable.
 
 To specify a calibration curve, use the ``-c`` command line option::
 
-    ./gnucal.py -d 790 -s 60 -p -c marine04.14c
+    ./gnucal.py -d 790 -s 60 -p -c marine04
 
 We're working on a script to automate the download of such calibration
 data, or obtain an authorization for distributing the original files
