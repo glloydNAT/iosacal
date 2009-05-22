@@ -45,10 +45,9 @@ def calibrate(f_m, sigma_m, f_t, sigma_t):
 class CalibrationCurve(object):
     '''A radiocarbon calibration curve.'''
 
-    def __init__(self, calibration_file, interpolate=False):
-        self._file = open(calibration_file)
+    def __init__(self, calibration_string, interpolate=False):
+        self._lines = calibration_string.splitlines()
         self.interpolate = interpolate
-        self._lines = self._file.readlines()
         self.title = self._lines[0].strip('#\n')
         self._data = [ l for l in self._lines if not '#' in l ]
         self._list = reader(self._data, skipinitialspace = True)

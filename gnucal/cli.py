@@ -18,6 +18,8 @@
 # You should have received a copy of the GNU General Public License
 # along with GNUCal.  If not, see <http://www.gnu.org/licenses/>.
 
+import pkg_resources
+
 from optparse import OptionParser, OptionGroup
 
 from gnucal import core, plot
@@ -44,7 +46,7 @@ parser.add_option("-p", "--plot",
                   action="store_true",
                   help="output results to graphic plot")
 parser.add_option("-c", "--curve",
-                  default="intcal04.14c",
+                  default="intcal04",
                   type="str",
                   dest="curve",
                   help="calibration curve to be used [default: %default]")
@@ -101,11 +103,12 @@ if not (options.date and options.sigma):
     parser.error('Please provide date and standard deviation')
 
 def main():
-    cc = core.CalibrationCurve(options.curve, interpolate=options.interpolate)
+    curve_data_string = pkg_resources.resource_string("gnucal", "data/%s.14c" % options.curve)
+    curve = core.CalibrationCurve(curve_data_string, interpolate=options.interpolate)
     calibrated_ages = []
     for d, s in zip(options.date, options.sigma):
         rs = core.RadiocarbonSample(d,s)
-        ca = core.CalibratedAge(cc, rs, BP=options.BP)
+        ca = core.CalibratedAge(curve, rs, BP=options.BP)
         calibrated_ages.append(ca)
         if options.plot and options.single is True:
             plot.single_plot(ca,oxcal=options.oxcal)
