@@ -8,13 +8,22 @@ setup(name='gnucal',
       description="GNUCal is a radiocarbon (14C) calibration program",
       long_description="""\
 """,
-      classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+      classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Environment :: Console',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Scientific/Engineering',
+        ],
       keywords='radiocarbon calibration',
       author='Stefano Costa',
       author_email='steko@iosa.it',
       url='http://gnucal.iosa.it/',
       license='GNU GPLv3',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
+      package_data={'gnucal': ['data/*.14c']},
       include_package_data=True,
       zip_safe=False,
       install_requires=[
@@ -25,7 +34,8 @@ setup(name='gnucal',
       ],
       entry_points= {
         'console_scripts': [
-            'gnucal = gnucal:main',
+            'gnucal = gnucal.cli:main',
             ]
-        }
+        },
+      setup_requires = ['setuptools_hg'],
       )
