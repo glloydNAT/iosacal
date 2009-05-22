@@ -23,7 +23,7 @@ from optparse import OptionParser, OptionGroup
 from gnucal import core, plot
 
 
-usage = "usage: %prog [option] arg1 [option] arg2 ..."
+usage = "usage: %prog -d DATE -s SIGMA [other options] ..."
 
 parser = OptionParser(usage = usage)
 parser.add_option("-d", "--date",
@@ -107,15 +107,14 @@ def main():
         rs = core.RadiocarbonSample(d,s)
         ca = core.CalibratedAge(cc, rs, BP=options.BP)
         calibrated_ages.append(ca)
-        if options.plot is True:
-            if options.single is True:
-                plot.single_plot(ca,oxcal=options.oxcal)
-            if options.multi is True:
-                plot.multi_plot(
-                                calibrated_ages,
-                                oxcal=options.oxcal,
-                                name=options.name
-                                )
+        if options.plot and options.single is True:
+            plot.single_plot(ca,oxcal=options.oxcal)
+    if options.plot and options.multi is True:
+        plot.multi_plot(
+                        calibrated_ages,
+                        oxcal=options.oxcal,
+                        name=options.name
+                        )
 
 if __name__ == '__main__':
     main()
