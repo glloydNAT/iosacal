@@ -30,7 +30,7 @@ import hpd
 
 
 def single_plot(calibrated_age,oxcal=False):
-    
+
     calibrated_curve = calibrated_age.array
     f_m, sigma_m = calibrated_age.f_m, calibrated_age.sigma_m
     calibration_curve = calibrated_age.calibration_curve
@@ -48,7 +48,7 @@ def single_plot(calibrated_age,oxcal=False):
                 return "BC %d" % year
         else:
             return "BP %d" % year
-            
+
     min_year, max_year = (50000, -50000)
 
     if min_year < min(calibrated_curve[:,0]):
@@ -161,7 +161,7 @@ def single_plot(calibrated_age,oxcal=False):
     ax3.set_axis_off()
 
     # Calibration Curve
-    
+
     mlab_low  = [ n[1] - n[2] for n in calibration_curve ]
     mlab_high = [ n[1] + n[2] for n in calibration_curve ]
 
