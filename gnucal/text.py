@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with GNUCal.  If not, see <http://www.gnu.org/licenses/>.
 
-from gnucal import core, hpd, util
+from gnucal import util
 
 
 def single_text(calibrated_age):
@@ -31,8 +31,16 @@ def single_text(calibrated_age):
     intervals95 = calibrated_age.intervals95
     BP = calibrated_age.BP
 
-    string68 = "".join(util.interval_to_string(itv) for itv in intervals68)
-    string95 = "".join(util.interval_to_string(itv) for itv in intervals95)
+    string68 = "".join(
+        util.interval_to_string(
+            itv, calibrated_curve, BP
+            ) for itv in intervals68
+        )
+    string95 = "".join(
+        util.interval_to_string(
+            itv, calibrated_curve, BP
+            ) for itv in intervals95
+        )
 
     print("-------------\n GNUCal v0.1\n-------------\n\n%s\n" % calibration_curve_title)
     print("Radiocarbon determination (BP): %d ± %d BP\n" % (f_m, sigma_m))
