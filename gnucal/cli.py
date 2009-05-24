@@ -22,7 +22,7 @@ import pkg_resources
 
 from optparse import OptionParser, OptionGroup
 
-from gnucal import core, plot
+from gnucal import core, plot, text
 
 
 usage = "usage: %prog -d DATE -s SIGMA [other options] ..."
@@ -112,6 +112,8 @@ def main():
         calibrated_ages.append(ca)
         if options.plot and options.single is True:
             plot.single_plot(ca,oxcal=options.oxcal)
+        else:
+            text.single_text(ca)
     if options.plot and options.multi is True:
         plot.multi_plot(
                         calibrated_ages,
