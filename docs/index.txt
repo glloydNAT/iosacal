@@ -80,7 +80,6 @@ calibration and related topics. Here's a brief list:
 .. _OxCal: http://c14.arch.ox.ac.uk/embed.php?File=oxcal.html
 .. _CALIB: http://calib.qub.ac.uk/calib/
 .. _Radiocarbon: http://radiocarbon.org/
-.. _`IntCal04 Supplemental Data`: http://www.radiocarbon.org/IntCal04.htm
 
 Site contents
 -------------
