@@ -44,10 +44,10 @@ def single_text(calibrated_age):
             ) for itv in intervals95
         )
 
-    sys.stdout.write("-------------\n GNUCal v0.1\n-------------\n\n%s\n\n" \
+    sys.stdout.write("="*13+"\n GNUCal v0.1\n"+"="*13+"\n\n%s\n\n" \
           % calibration_curve_title)
     sys.stdout.write("Radiocarbon determination (BP): %d ± %d BP\n\n" \
               % (f_m, sigma_m))
-    sys.stdout.write("Calibrated date\n")
+    sys.stdout.write("Calibrated date\n"+"-"*15+"\n\n")
     sys.stdout.write("68.2%% probability\n%s\n95.4%% probability\n%s" \
               % (string68, string95))
