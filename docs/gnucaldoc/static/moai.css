@@ -5,7 +5,7 @@
 body {
     font-family: sans-serif;
     font-size: 100%;
-    background-color: #4878b6;
+    background-color: #84878a;
     color: #000;
     margin: 0;
     padding: 0;
@@ -17,7 +17,7 @@ img { border:0; }
 
 
 div.document {
-    background-color: #4878b6;
+    background-color: #84878a;
 }
 
 div.documentwrapper {
@@ -26,7 +26,7 @@ div.documentwrapper {
 }
 
 div.bodywrapper {
-    background: #4878b6 url(skyline.jpg) repeat-x 334px;
+    background: #84878a url(skyline.jpg) repeat-x 334px;
     margin: 0 0 0 334px;
 }
 
@@ -37,7 +37,7 @@ div.body {
 
 
 div.sphinxsidebar {
-    background: #4878b6;
+    background: #84878a;
     float: left;
     width: 334px;
     margin-left: -100%;
@@ -74,7 +74,7 @@ span.infrae_logo img {
 }
 
 div.related {
-    background: #27467d;
+    background: #525557;
     color: #fff;
     width: 100%;
     line-height: 30px;
@@ -158,7 +158,7 @@ div.sphinxsidebar ul ul {
 }
 
 div.sphinxsidebar a {
-    color: #98dbcc;
+    color: #f6fcf2;
 }
 
 div.sphinxsidebar form {
@@ -166,7 +166,7 @@ div.sphinxsidebar form {
 }
 
 div.sphinxsidebar input {
-    border: 1px solid #98dbcc;
+    border: 1px solid #f6fcf2;
     font-family: sans-serif;
     font-size: 1em;
 }
@@ -313,7 +313,7 @@ p.subhead {
 }
 
 a {
-    color: #4878b6;
+    color: #84878a;
     text-decoration: none;
 }
 
@@ -329,7 +329,7 @@ div.body h4,
 div.body h5,
 div.body h6 {
     font-family: 'Trebuchet MS', sans-serif;
-    background-color: #27467d;
+    background-color: #525557;
     font-weight: normal;
     color: white;
     border-bottom: 1px solid #ccc;
