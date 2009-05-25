@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with GNUCal.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
+
 from gnucal import util
 
 
@@ -42,10 +44,10 @@ def single_text(calibrated_age):
             ) for itv in intervals95
         )
 
-    print("-------------\n GNUCal v0.1\n-------------\n\n%s\n" \
+    sys.stdout.write("-------------\n GNUCal v0.1\n-------------\n\n%s\n\n" \
           % calibration_curve_title)
-    print("Radiocarbon determination (BP): %d ± %d BP\n" \
+    sys.stdout.write("Radiocarbon determination (BP): %d ± %d BP\n\n" \
               % (f_m, sigma_m))
-    print("Calibrated date")
-    print("68.2%% probability\n%s\n95.4%% probability\n%s" \
+    sys.stdout.write("Calibrated date\n")
+    sys.stdout.write("68.2%% probability\n%s\n95.4%% probability\n%s" \
               % (string68, string95))
