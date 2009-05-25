@@ -38,4 +38,4 @@ def interval_to_string(interval, calibrated_curve, BP):
 
     i = [ad_bc_prefix(year, BP) for year in interval]
     percent = hpd.confidence_percent(interval, calibrated_curve) * 100
-    return ' %s ‒ %s (%2.1f %%)\n' % (i[0], i[1], percent)
+    return u' %s ‒ %s (%2.1f %%)\n' % (i[0], i[1], percent)
