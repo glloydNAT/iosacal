@@ -1,0 +1,10 @@
+:mod:`util` -- Utility functions
+=================================
+
+
+.. automodule:: gnucal.util
+
+
+.. autofunction:: ad_bc_prefix
+
+.. autofunction:: interval_to_string

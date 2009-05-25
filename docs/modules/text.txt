@@ -1,0 +1,6 @@
+:mod:`text` -- Text output
+==========================
+
+.. automodule:: gnucal.text
+
+.. autofunction:: single_text
