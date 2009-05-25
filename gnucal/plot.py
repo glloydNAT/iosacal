@@ -26,8 +26,7 @@ import matplotlib.mlab as mlab
 
 from pylab import normpdf
 
-import hpd
-
+from gnucal import hpd, util
 
 def single_plot(calibrated_age,oxcal=False):
 
@@ -38,16 +37,6 @@ def single_plot(calibrated_age,oxcal=False):
     intervals68 = calibrated_age.intervals68
     intervals95 = calibrated_age.intervals95
     BP = calibrated_age.BP
-
-    def ad_bc_prefix(year):
-        '''Return a string with BC/AD prefix and the given year.'''
-        if BP is False:
-            if year > 0:
-                return "AD %d" % year
-            else:
-                return "BC %d" % year
-        else:
-            return "BP %d" % year
 
     min_year, max_year = (50000, -50000)
 
@@ -70,17 +59,16 @@ def single_plot(calibrated_age,oxcal=False):
     else:
         ad_bp_label = "BP"
 
-    string68 = ''
-    for ys in intervals68:
-        i = map(ad_bc_prefix,ys)
-        percent = hpd.confidence_percent(ys, calibrated_curve) * 100
-        string68 += ' %s (%2.1f %%) %s\n' % (i[0], percent, i[1])
-
-    string95 = ''
-    for ys in intervals95:
-        i = map(ad_bc_prefix,ys)
-        percent = hpd.confidence_percent(ys, calibrated_curve) * 100
-        string95 += ' %s (%2.1f %%) %s\n' % (i[0], percent, i[1])
+    string68 = "".join(
+        util.interval_to_string(
+            itv, calibrated_curve, BP
+            ) for itv in intervals68
+        )
+    string95 = "".join(
+        util.interval_to_string(
+            itv, calibrated_curve, BP
+            ) for itv in intervals95
+        )
 
     fig = plt.figure(figsize=(12,8))
     ax1 = plt.subplot(111)
@@ -91,7 +79,8 @@ def single_plot(calibrated_age,oxcal=False):
          verticalalignment='center',
          transform = ax1.transAxes,
          bbox=dict(facecolor='white', alpha=0.9, lw=0))
-    plt.text(0.75, 0.80,'68.2%% probability\n%s\n95.4%% probability\n%s' % (str(string68), str(string95)),
+    plt.text(0.75, 0.80,'68.2%% probability\n%s\n95.4%% probability\n%s' \
+                 % (string68, string95),
          horizontalalignment='left',
          verticalalignment='center',
          transform = ax1.transAxes,
@@ -108,9 +97,10 @@ def single_plot(calibrated_age,oxcal=False):
     ax2 = plt.twinx()
 
     if oxcal is True:
+        # imitate OxCal
         ax2.fill(
             calibrated_curve[:,0],
-            calibrated_curve[:,1] + max(calibrated_curve[:,1])*0.3, # imitate OxCal
+            calibrated_curve[:,1] + max(calibrated_curve[:,1])*0.3,
             'k',
             alpha=0.3,
             label='Calendar Age'
@@ -178,16 +168,52 @@ def single_plot(calibrated_age,oxcal=False):
 
     if oxcal is True:
         for i in intervals68:
-            ax1.axvspan(min(i), max(i), ymin=0.05, ymax=0.07, facecolor='none', alpha=0.8)
-            ax1.axvspan(min(i), max(i), ymin=0.069, ymax=0.071, facecolor='w', lw=0)
+            ax1.axvspan(
+                min(i),
+                max(i),
+                ymin=0.05,
+                ymax=0.07,
+                facecolor='none',
+                alpha=0.8)
+            ax1.axvspan(
+                min(i),
+                max(i),
+                ymin=0.069,
+                ymax=0.071,
+                facecolor='w',
+                lw=0)
         for i in intervals95:
-            ax1.axvspan(min(i), max(i), ymin=0.025, ymax=0.045, facecolor='none', alpha=0.8)
-            ax1.axvspan(min(i), max(i), ymin=0.044, ymax=0.046, facecolor='w', lw=0)
+            ax1.axvspan(
+                min(i),
+                max(i),
+                ymin=0.025,
+                ymax=0.045,
+                facecolor='none',
+                alpha=0.8)
+            ax1.axvspan(
+                min(i),
+                max(i),
+                ymin=0.044,
+                ymax=0.046,
+                facecolor='w',
+                lw=0)
     else:
         for i in intervals68:
-            ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
+            ax1.axvspan(
+                min(i),
+                max(i),
+                ymin=0,
+                ymax=0.02,
+                facecolor='k',
+                alpha=0.5)
         for i in intervals95:
-            ax1.axvspan(min(i), max(i), ymin=0, ymax=0.02, facecolor='k', alpha=0.5)
+            ax1.axvspan(
+                min(i),
+                max(i),
+                ymin=0,
+                ymax=0.02,
+                facecolor='k',
+                alpha=0.5)
 
     plt.savefig('image_%d±%d.pdf' %(f_m, sigma_m))
     fig = plt.gcf()
@@ -254,9 +280,21 @@ def multi_plot(calibrated_ages,name,oxcal=False):
         # Confidence intervals
 
         for i in calibrated_curve.intervals95:
-            ax1.axvspan(min(i), max(i), ymin=0.6, ymax=0.7, facecolor='k', alpha=0.5)
+            ax1.axvspan(
+                min(i),
+                max(i),
+                ymin=0.6,
+                ymax=0.7,
+                facecolor='k',
+                alpha=0.5)
         for i in calibrated_curve.intervals68:
-            ax1.axvspan(min(i), max(i), ymin=0.6, ymax=0.7, facecolor='k', alpha=0.8)
+            ax1.axvspan(
+                min(i),
+                max(i),
+                ymin=0.6,
+                ymax=0.7,
+                facecolor='k',
+                alpha=0.8)
 
     plt.savefig('image_%s.png' % name )
     fig = plt.gcf()
