@@ -27,15 +27,20 @@ from hpd import alsuren_hpd, confidence_percent
 try:
     from scipy.interpolate import interp1d
 except ImportError:
+    #: if SciPy is available, also interpolation will be
     HAS_SCIPY = False
 else:
     HAS_SCIPY = True
 
 
 def calibrate(f_m, sigma_m, f_t, sigma_t):
-    '''Calibration formula as defined by Bronk Ramsey 2008.
+    r'''Calibration formula as defined by Bronk Ramsey 2008.
 
-    doi: 10.1111/j.1475-4754.2008.00394.x'''
+    .. math::
+
+       P(t) \propto \frac{\exp \left[-\frac{(f_m - f(t))^2}{2 (\sigma^2_{fm} + \sigma^2_{f}(t))}\right]}{\sqrt{\sigma^2_{fm} + \sigma^2_{f}(t)}}
+
+See doi: 10.1111/j.1475-4754.2008.00394.x for a detailed account.'''
 
     sigma_sum = pow(sigma_m, 2) + pow(sigma_t, 2)
     P_t = ( exp( - pow(f_m - f_t, 2 ) /
@@ -44,7 +49,10 @@ def calibrate(f_m, sigma_m, f_t, sigma_t):
 
 
 class CalibrationCurve(object):
-    '''A radiocarbon calibration curve.'''
+    '''A radiocarbon calibration curve.
+
+    Calibration data is loaded at runtime from source data files, and
+    exposed as an ``array`` object.'''
 
     def __init__(self, calibration_string, interpolate=False):
         self._lines = calibration_string.splitlines()
@@ -94,12 +102,13 @@ class RadiocarbonSample(object):
 
 class CalibratedAge(object):
     '''A calibrated radiocarbon age.
-    
+
     This object is self-contained, it exposes both the calibration curve and
     the radiocarbon sample objects so that they're available for output
     interfaces directly.
-    
-    Also BP is an attribute of CalibratedAge.'''
+
+    Also ``BP`` is an attribute of CalibratedAge, that determines the desired
+    output requested by the user.'''
 
     def __init__(self, calibration_curve, radiocarbon_sample, BP):
         self.f_m               = radiocarbon_sample.date

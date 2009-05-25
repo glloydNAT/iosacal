@@ -1,9 +1,8 @@
 :mod:`plot` -- Plotting functions
 =================================
 
-.. module:: plot
-   :synopsis: Functions for single and multiple plots
-.. moduleauthor:: Stefano Costa <steko@iosa.it>
+.. automodule:: gnucal.plot
+   :synopsis: plotting functions
 
-This module contains two main functions, that draw single and multiple
-plots containing information about calibrated radiocarbon dates.
+.. autofunction:: single_plot
+.. autofunction:: multi_plot

@@ -1,20 +1,7 @@
 :mod:`hpd` -- Highest Probability Density
 =========================================
 
-.. module:: hpd
-   :synopsis: Highest Probability Density functions
-.. moduleauthor:: Stefano Costa <steko@iosa.it>
-.. moduleauthor:: David Laban <alsuren@gmail.com>
+.. automodule:: gnucal.hpd
 
-This module contains two functions that return Highest Probability
-Density (HPD) given a curve of probability like those that describe
-calibrated radiocarbon ages.
-
-.. function:: alsuren_hpd(calibrated_curve, alpha):
-   
-   Return year spans that have the required Highest Probability
-   Density.
-
-.. function:: confidence_percent(years, array):
-    
-    Return HPD as percent value for a given span of years.
+.. autofunction:: alsuren_hpd
+.. autofunction:: confidence_percent
