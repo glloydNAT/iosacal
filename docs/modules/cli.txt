@@ -1,0 +1,11 @@
+:mod:`cli` -- GNUCal command line interface
+===========================================
+
+.. module:: gnucal.cli
+   :synopsis: command line interface
+
+.. function:: main
+   
+   The main program procedure.
+
+   By default produces text output to stdout for each sample.

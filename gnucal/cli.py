@@ -103,6 +103,10 @@ if not (options.date and options.sigma):
     parser.error('Please provide date and standard deviation')
 
 def main():
+    """Main program procedure.
+
+    By default produces text output to stdout for each sample."""
+
     curve_data_string = pkg_resources.resource_string("gnucal", "data/%s.14c" % options.curve)
     curve = core.CalibrationCurve(curve_data_string, interpolate=options.interpolate)
     calibrated_ages = []
