@@ -12,7 +12,7 @@ Command line options
 
 GNUCal works from the command line. These are the available options.
 
-.. program:: gnucal.py
+.. program:: gnucal
 
 .. cmdoption:: -h 
 
@@ -34,10 +34,6 @@ GNUCal works from the command line. These are the available options.
    If you want to specify a different calibration curve provide the
    curve canonical name in lower case (e.g. ``intcal04``, ``marine04``,
    ``shcal04``).
-
-.. cmdoption:: -o, --oxcal
-
-   Draw plots more OxCal-like looking [default: False]
 
 .. cmdoption:: -i, --interpolate
 
@@ -62,9 +58,21 @@ you like as output.
 
    Express date in Calibrated BC/AD Calendar Age
 
+Plotting options
+~~~~~~~~~~~~~~~~
+
+.. cmdoption:: -p, --plot
+
+   Create one or more plots (see `Single and multiple plots`_) instead
+   of the text output.
+
+.. cmdoption:: -o, --oxcal
+
+   Draw plots more OxCal-like looking [default: False]
+
 
 Single and multiple plots
-~~~~~~~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++++++++
 
 Use these two options when more than 1 sample is supplied to choose
 which output is generated.
@@ -85,37 +93,70 @@ which output is generated.
 Basic usage
 -----------
 
-GNUCal is not (yet) a complete Python package, so to use it, just extract files
-from the archive and ``cd gnucal``. The command line program is called
-``gnucal.py``.
+The command line program is called ``gnucal``. It can generate both
+text output and image plots.
 
 The typical usage is::
 
-    ./gnucal.py -d 790 -s 60 -p
+    gnucal -d 790 -s 60
 
-The result is saved into the image named ``gnucal_790±60.png``. It
-will look more or less like this:
+Output will look like the following:
+
+.. highlight:: rest
+
+::
+
+   =============
+    GNUCal v0.1
+   =============
+
+   Atmospheric data from Reimer et al (2004);
+
+   Radiocarbon determination (BP): 790 ± 60 BP
+
+   Calibrated date
+   ---------------
+
+   68.2% probability
+    BP 760 ‒ BP 755 (5.2 %)
+    BP 740 ‒ BP 675 (61.2 %)
+
+   95.4% probability
+    BP 900 ‒ BP 865 (4.6 %)
+    BP 825 ‒ BP 815 (1.4 %)
+    BP 800 ‒ BP 655 (88.9 %)
+
+
+If you want an image instead of text output, just add the ``-p`` flag::
+
+    gnucal -d 790 -s 60 -p
+
+The result will be saved into the image file named
+``gnucal_790±60.png`` in the same directory. It will look more or less
+like this:
 
 .. image:: /images/image_790±60.png
 
 Other calibration curves
 ------------------------
 
-By default, ``gnucal.py`` tries to use the *IntCal04* calibration
-curve, looking for a file named ``intcal04.14c`` in the same directory
-where it is executed. GNUCal is however able to read *any* calibration
-curve that uses the same format as ``intcal04.14c``, like those
-available on <http://www.radiocarbon.org/>. If you need to use another
-calibration curve than the *IntCal04* one, just download it and make
-sure it's in the same directory of the main executable.
+By default, ``gnucal`` uses the *IntCal04* calibration curve. GNUCal
+is however able to read *any* calibration curve that uses the same
+format as ``intcal04.14c``, like those available on
+<http://www.radiocarbon.org/>. If you want to specify a different
+calibration curve provide the curve canonical name in lower case
+(e.g. ``intcal04``, ``marine04``, ``shcal04``).
 
 To specify a calibration curve, use the ``-c`` command line option::
 
-    ./gnucal.py -d 790 -s 60 -p -c marine04
+    ./gnucal -d 790 -s 60 -p -c marine04
 
-We're working on a script to automate the download of such calibration
-data, or obtain an authorization for distributing the original files
-with GNUCal.
+
+.. todo::
+
+   Rewrite this section about other calibration curves once we have
+   received authorization to distribute calibration data files.
+
 
 Interpolation
 -------------
@@ -131,7 +172,7 @@ particularly concerning probability intervals.
 
 Use the ``-i`` flag to activate interpolation::
 
-    ./gnucal.py -d 790 -s 60 -p --ad -i
+    ./gnucal -d 790 -s 60 -p --ad -i
 
 GNUCal makes use of the **SciPy** library for interpolating calibration curves.
 Even if SciPy is not required for GNUCal's normal usage and interpolation is
@@ -150,10 +191,15 @@ Multiple dates
 It is also possible to give GNUCal more than one radiocarbon determination,
 to see how 2 or more samples relate between themselves.
 
+.. warning::
+
+   Currently GNUCal doesn't perform any Bayesian matching of
+   calibrated ages. This feature will be added in future versions.
+
 To use the multiple dates feature, just pass more ``-d`` and ``-s`` options
 on the command line::
 
-    ./gnucal.py -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p
+    ./gnucal -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p
 
 The order in which values are passed to GNUCal matters, so the first
 date will be matched to the first standard deviation and so on.
@@ -161,12 +207,12 @@ date will be matched to the first standard deviation and so on.
 This way, you will get 3 different single plots. If you want to obtain
 also a compound plot, add the ``-m`` flag::
 
-    ./gnucal.py -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p -m
+    ./gnucal -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p -m
 
 It's also useful to use the ``-n`` option to give a name to the image, and
 also a title to the plot::
 
-    ./gnucal.py -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p -m -n "Donetta"
+    ./gnucal -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p -m -n "Donetta"
 
 
 .. image:: /images/image_Donetta.png
