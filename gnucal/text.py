@@ -37,12 +37,12 @@ def single_text(calibrated_age):
         util.interval_to_string(
             itv, calibrated_curve, BP
             ) for itv in intervals68
-        )
+        ).encode("utf-8")
     string95 = "".join(
         util.interval_to_string(
             itv, calibrated_curve, BP
             ) for itv in intervals95
-        )
+        ).encode("utf-8")
 
     sys.stdout.write("="*13+"\n GNUCal v0.1\n"+"="*13+"\n\n%s\n\n" \
           % calibration_curve_title)
