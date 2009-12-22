@@ -117,7 +117,7 @@ def main():
         if options.plot and options.single is True:
             plot.single_plot(ca,oxcal=options.oxcal)
         else:
-            text.single_text(ca)
+            print text.single_text(ca)
     if options.plot and options.multi is True:
         plot.multi_plot(
                         calibrated_ages,
