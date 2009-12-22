@@ -140,6 +140,10 @@ class CalibratedAge(object):
         self.intervals68 = alsuren_hpd(self.array,0.318)
         self.intervals95 = alsuren_hpd(self.array,0.046)
 
+    def __str__(self):
+        return "CalibratedAge( %d ± %d )" % (self.f_m, self.sigma_m)
+
+
 class ConfidenceInterval(object):
     '''A confidence interval expressed as a probability percent.'''
 
