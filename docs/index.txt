@@ -72,7 +72,6 @@ calibration and related topics. Here's a brief list:
   research articles and date lists relevant to 14C and other
   radioisotopes and techniques used in archaeological, geophysical,
   oceanographic, and related dating
-- `IntCal04 Supplemental Data`_ including common used calibration curves
 
 .. _`IntCal04 Supplemental Data`: http://www.radiocarbon.org/IntCal04.htm
 .. _`Oxford Radiocarbon Accelerator Unit`: http://c14.arch.ox.ac.uk/
