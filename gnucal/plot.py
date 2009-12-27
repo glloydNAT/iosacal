@@ -28,7 +28,7 @@ from pylab import normpdf
 
 from gnucal import hpd, util
 
-def single_plot(calibrated_age,oxcal=False):
+def single_plot(calibrated_age, oxcal=True, output=None):
 
     calibrated_curve = calibrated_age.array
     f_m, sigma_m = calibrated_age.f_m, calibrated_age.sigma_m
@@ -215,7 +215,9 @@ def single_plot(calibrated_age,oxcal=False):
                 facecolor='k',
                 alpha=0.5)
 
-    plt.savefig('image_%d±%d.pdf' %(f_m, sigma_m))
+    #plt.savefig('image_%d±%d.pdf' %(f_m, sigma_m))
+    if output:
+        plt.savefig(output)
     fig = plt.gcf()
     fig.clear()
 
