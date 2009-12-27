@@ -127,10 +127,11 @@ def single_plot(calibrated_age, oxcal=True, output=None):
             )
 
     ax2.set_ybound(min(calibrated_curve[:,1]),max(calibrated_curve[:,1])*3)
+    ax2.set_xbound(min(calibrated_curve[:,0]),max(calibrated_curve[:,0]))
     ax2.set_axis_off()
 
     # Radiocarbon Age
-    sample_interval = calibration_curve[:,0].copy()
+    sample_interval = 1950 - calibration_curve[:,0].copy()
     sample_curve = normpdf(sample_interval, f_m, sigma_m)
 
     ax3 = plt.twiny(ax1)
@@ -147,7 +148,7 @@ def single_plot(calibrated_age, oxcal=True, output=None):
         alpha=0.3,
         label='Radiocarbon determination (BP)'
         )
-    ax3.set_xbound(min(sample_curve),max(sample_curve)*4)
+    ax3.set_xbound(0,max(sample_curve)*4)
     ax3.set_axis_off()
 
     # Calibration Curve
@@ -159,10 +160,6 @@ def single_plot(calibrated_age, oxcal=True, output=None):
                                mlab_low,
                                mlab_high)
     ax1.fill(xs, ys, 'b', alpha=0.3)
-    # FIXME the following values 10 and 5 are arbitrary and could be probably
-    # drawn from the f_m value itself, while preserving their ratio
-    ax1.set_ybound(f_m - sigma_m * 15, f_m + sigma_m * 5)
-    ax1.set_xbound(min(calibrated_curve[:,0]),max(calibrated_curve[:,0]))
 
     # Confidence intervals
 
@@ -214,6 +211,11 @@ def single_plot(calibrated_age, oxcal=True, output=None):
                 ymax=0.02,
                 facecolor='k',
                 alpha=0.5)
+
+    # FIXME the following values 10 and 5 are arbitrary and could be probably
+    # drawn from the f_m value itself, while preserving their ratio
+    ax1.set_ybound(f_m - sigma_m * 15, f_m + sigma_m * 5)
+    ax1.set_xbound(min(calibrated_curve[:,0]),max(calibrated_curve[:,0]))
 
     #plt.savefig('image_%d±%d.pdf' %(f_m, sigma_m))
     if output:
