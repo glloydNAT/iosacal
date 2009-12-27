@@ -175,10 +175,11 @@ def single_plot(calibrated_age, oxcal=True, output=None):
             ax1.axvspan(
                 min(i),
                 max(i),
-                ymin=0.069,
-                ymax=0.071,
+                ymin=0.068,
+                ymax=0.072,
                 facecolor='w',
-                lw=0)
+                edgecolor='w',
+                lw=2)
         for i in intervals95:
             ax1.axvspan(
                 min(i),
@@ -190,10 +191,11 @@ def single_plot(calibrated_age, oxcal=True, output=None):
             ax1.axvspan(
                 min(i),
                 max(i),
-                ymin=0.044,
-                ymax=0.046,
+                ymin=0.043,
+                ymax=0.047,
                 facecolor='w',
-                lw=0)
+                edgecolor='w',
+                lw=2)
     else:
         for i in intervals68:
             ax1.axvspan(
