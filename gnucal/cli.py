@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# filename: gnucal.py
-# Copyright 2008-2009 Stefano Costa <steko@iosa.it>
+# filename: cli.py
+# Copyright 2008-2010 Stefano Costa <steko@iosa.it>
 #
 # This file is part of GNUCal.
 
@@ -115,7 +115,8 @@ def main():
         ca = core.CalibratedAge(curve, rs, BP=options.BP)
         calibrated_ages.append(ca)
         if options.plot and options.single is True:
-            plot.single_plot(ca,oxcal=options.oxcal)
+            outputname = 'iosacal_%d±%d.pdf' %(d, s) # default
+            plot.single_plot(ca,oxcal=options.oxcal,output=outputname)
         else:
             print text.single_text(ca)
     if options.plot and options.multi is True:
