@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # filename: text.py
-# Copyright 2009 Stefano Costa <steko@iosa.it>
+# Copyright 2009-2010 Stefano Costa <steko@iosa.it>
 #
 # This file is part of GNUCal.
 
@@ -66,7 +66,7 @@ def single_text(calibrated_age):
     output = Template(u'''
 ============
 GNUCal v0.1
-=============
+============
 
 $calibration_curve_title
 
