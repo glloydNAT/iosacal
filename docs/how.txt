@@ -2,17 +2,46 @@
 User's manual
 =============
 
-The current version of GNUCal is in alpha state (i.e. not suitable for
+.. contents::
+
+The current version of IOSACal is in alpha state (i.e. not suitable for
 production use), but has already all the basic functionality, like
 calibration, generation of publication-quality plots and determination
 of probability intervals.
 
+Download
+--------
+
+As a software, IOSACal is still in its infancy. The 0.1 version will be
+released soon, but in the meantime you can get the development version from
+bitbucket_, either with the `complete project history`_ or as a simple `source
+archive`_.
+
+.. _bitbucket: http://bitbucket.org/steko/iosacal/
+.. _`complete project history`: http://bitbucket.org/steko/iosacal/overview/
+.. _`source archive`: http://bitbucket.org/steko/iosacal/get/tip.bz2
+
+Installing
+----------
+
+Just extract the downloaded archive, move to the main directory and::
+
+     python setup.py install
+
+from the main directory. Using pip_ and virtualenv_ is strongly
+recommended.
+
+.. _pip: http://pip.openplans.org/
+.. _virtualenv: http://pypi.python.org/pypi/virtualenv
+
+After the install has completed, the ``iosacal`` binary will be available.
+
 Command line options
 --------------------
 
-GNUCal works from the command line. These are the available options.
+IOSACal works from the command line. These are the available options.
 
-.. program:: gnucal
+.. program:: iosacal
 
 .. cmdoption:: -h 
 
@@ -29,11 +58,10 @@ GNUCal works from the command line. These are the available options.
 
 .. cmdoption:: -c <curve>, --curve=<curve>
 
-   Calibration curve to be used [default: ``intcal04``]
+   Calibration curve to be used [default: ``intcal09``]
 
    If you want to specify a different calibration curve provide the
-   curve canonical name in lower case (e.g. ``intcal04``, ``marine04``,
-   ``shcal04``).
+   curve canonical name in lower case (e.g. ``intcal09``, ``marine09``).
 
 .. cmdoption:: -i, --interpolate
 
@@ -42,7 +70,7 @@ GNUCal works from the command line. These are the available options.
 
 .. cmdoption:: -n <name>, --name=<name>
 
-   Name of sample, used also for output image [default: gnucal]
+   Name of sample, used also for output image [default: iosacal]
 
 BP or BC/AD dates
 ~~~~~~~~~~~~~~~~~
@@ -93,12 +121,12 @@ which output is generated.
 Basic usage
 -----------
 
-The command line program is called ``gnucal``. It can generate both
+The command line program is called ``iosacal``. It can generate both
 text output and image plots.
 
 The typical usage is::
 
-    gnucal -d 790 -s 60
+    iosacal -d 790 -s 60
 
 Output will look like the following:
 
@@ -106,11 +134,11 @@ Output will look like the following:
 
 ::
 
-   =============
-    GNUCal v0.1
-   =============
+   ==============
+    IOSACal v0.1
+   ==============
 
-   Atmospheric data from Reimer et al (2004);
+   Atmospheric data from Reimer et al (2009);
 
    Radiocarbon determination (BP): 790 ± 60 BP
 
@@ -129,10 +157,10 @@ Output will look like the following:
 
 If you want an image instead of text output, just add the ``-p`` flag::
 
-    gnucal -d 790 -s 60 -p
+    iosacal -d 790 -s 60 -p
 
 The result will be saved into the image file named
-``gnucal_790±60.png`` in the same directory. It will look more or less
+``iosacal_790±60.pdf`` in the same directory. It will look more or less
 like this:
 
 .. image:: /images/image_790±60.png
@@ -140,16 +168,16 @@ like this:
 Other calibration curves
 ------------------------
 
-By default, ``gnucal`` uses the *IntCal04* calibration curve. GNUCal
+By default, ``iosacal`` uses the *IntCal09* calibration curve. IOSACal
 is however able to read *any* calibration curve that uses the same
-format as ``intcal04.14c``, like those available on
+format as ``intcal09.14c``, like those available on
 <http://www.radiocarbon.org/>. If you want to specify a different
 calibration curve provide the curve canonical name in lower case
-(e.g. ``intcal04``, ``marine04``, ``shcal04``).
+(e.g. ``intcal09``, ``marine09``).
 
 To specify a calibration curve, use the ``-c`` command line option::
 
-    ./gnucal -d 790 -s 60 -p -c marine04
+    iosacal -d 790 -s 60 -p -c marine09
 
 
 .. todo::
@@ -161,10 +189,10 @@ To specify a calibration curve, use the ``-c`` command line option::
 Interpolation
 -------------
 
-The standard *IntCal04* calibration curve [REI2004]_ has a varying resolution
-over the 26k calendar years it covers, starting with 20 years spaced values up
-to the 5 years resolution available from 12k BP onwards. Other curves show
-similar patterns.
+The standard *IntCal09* calibration curve has a varying resolution: data
+spacing changes from 5 years for the range from 0 to 11.2 to cal kBP, 10 yrs
+for 11.2–15 cal kBP, 20 yrs for 15–25 cal kBP, 50 yrs for 25–40 cal kBP, and
+100 yrs for 40–50 cal kBP [REI2009]_.
 
 This means that the output intervals will follow these limitations. It's
 possible to use linear interpolation to get more fine-grained results,
@@ -172,47 +200,47 @@ particularly concerning probability intervals.
 
 Use the ``-i`` flag to activate interpolation::
 
-    ./gnucal -d 790 -s 60 -p --ad -i
+    iosacal -d 790 -s 60 -p --ad -i
 
-GNUCal makes use of the **SciPy** library for interpolating calibration curves.
-Even if SciPy is not required for GNUCal's normal usage and interpolation is
+IOSACal makes use of the **SciPy** library for interpolating calibration curves.
+Even if SciPy is not required for IOSACal's normal usage and interpolation is
 disabled by default, installing SciPy is recommended.
 
-.. [REI2004] PJ Reimer, MGL Baillie, E Bard, A Bayliss, JW Beck, C Bertrand, PG
-   Blackwell, CE Buck, G Burr, KB Cutler, PE Damon, RL Edwards, RG Fairbanks, M
-   Friedrich, TP Guilderson, KA Hughen, B Kromer, FG McCormac, S Manning, C
-   Bronk Ramsey, RW Reimer, S Remmele, JR Southon, M Stuiver, S Talamo, FW
-   Taylor, J van der Plicht, and CE Weyhenmeyer (2004), Radiocarbon
-   46:1029-1058.
+.. [REI2009] Reimer PJ, Baillie MGL, Bard E, Bayliss A, Beck JW, Blackwell PG,
+   Bronk Ramsey C, Buck CE, Burr GS, Edwards RL, Friedrich M, Grootes PM,
+   Guilderson TP, Hajdas I, Heaton TJ, Hogg AG, Hughen KA, Kaiser KF, Kromer B,
+   McCormac FG, Manning SW, Reimer RW, Richards DA, Southon JR, Talamo S,
+   Turney CSM, van der Plicht J, Weyhenmeyer CE. 2009. IntCal09 and Marine09
+   radiocarbon age calibration curves, 0–50,000 years cal BP. Radiocarbon
+   51(4):1111–50.
 
 Multiple dates
 --------------
 
-It is also possible to give GNUCal more than one radiocarbon determination,
+It is also possible to give IOSACal more than one radiocarbon determination,
 to see how 2 or more samples relate between themselves.
 
 .. warning::
 
-   Currently GNUCal doesn't perform any Bayesian matching of
+   Currently IOSACal doesn't perform any Bayesian matching of
    calibrated ages. This feature will be added in future versions.
 
 To use the multiple dates feature, just pass more ``-d`` and ``-s`` options
 on the command line::
 
-    ./gnucal -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p
+    iosacal -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p
 
-The order in which values are passed to GNUCal matters, so the first
+The order in which values are passed to IOSACal matters, so the first
 date will be matched to the first standard deviation and so on.
 
 This way, you will get 3 different single plots. If you want to obtain
 also a compound plot, add the ``-m`` flag::
 
-    ./gnucal -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p -m
+    iosacal -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p -m
 
 It's also useful to use the ``-n`` option to give a name to the image, and
 also a title to the plot::
 
-    ./gnucal -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p -m -n "Donetta"
-
+    iosacal -d 790 -s 60 -d 917 -s 55 -d 1005 -s 45 -p -m -n "Donetta"
 
 .. image:: /images/image_Donetta.png
