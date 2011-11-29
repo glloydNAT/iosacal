@@ -1,0 +1,49 @@
+
+C14 and calibration resources
+=============================
+
+There are some interesting websites to learn about radiocarbon calibration and
+related topics. Some of them have been useful during the development of this
+software.
+
+Other software
+--------------
+
+- OxCal_ is developed by the RLAHA at Oxford
+- CALIB_ is a radiocarbon calibration program. A command-line Linux
+  version is available (non-free software, but works well)
+- BCal_ is an on-line Bayesian radiocarbon calibration tool hosted by
+  the Department of Probability and Statistics at the University of
+  Sheffield.
+
+.. _OxCal: http://c14.arch.ox.ac.uk/embed.php?File=oxcal.html
+.. _CALIB: http://calib.qub.ac.uk/calib/
+.. _BCal: http://bcal.shef.ac.uk/
+
+Reference websites
+------------------
+
+- `Oxford Radiocarbon Accelerator Unit`_ contains a detailed explanation of how
+  to use C14 datings and how calibration_ works
+- Radiocarbon_ is the main international journal of record for research
+  articles and date lists relevant to 14C and other radioisotopes and
+  techniques used in archaeological, geophysical, oceanographic, and related
+  dating techniques
+- `radiocarbon WEB-info`_ provides online information concerning the
+  radiocarbon dating method
+
+.. _`Oxford Radiocarbon Accelerator Unit`: http://c14.arch.ox.ac.uk/
+.. _calibration: http://c14.arch.ox.ac.uk/embed.php?File=calibration.html
+.. _Radiocarbon: http://radiocarbon.org/
+.. _`radiocarbon WEB-info`: http://www.c14dating.com/
+
+Calibration curves
+------------------
+
+- `IntCal09 Supplemental Data`_ to get the **calibration curves** in
+  ``.14c`` ASCII format
+- `IntCal04 Supplemental Data`_ are the previous version of the same data
+
+.. _`IntCal09 Supplemental Data`: http://www.radiocarbon.org/IntCal09.htm
+.. _`IntCal04 Supplemental Data`: http://www.radiocarbon.org/IntCal04.htm
+
