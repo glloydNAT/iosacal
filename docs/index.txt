@@ -82,8 +82,8 @@ Site contents
    :maxdepth: 1
    
    how
-   implementation
-   modules/index
+   users/index
+   developers/index
    glossary
    resources
    license

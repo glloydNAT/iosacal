@@ -1,5 +1,6 @@
-Development
-===========
+================
+ Implementation
+================
 
 IOSACal is written in the Python_ programming language, and it makes
 heavy use of the NumPy_ library for the internal management of calibration

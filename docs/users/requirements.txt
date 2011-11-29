@@ -1,0 +1,72 @@
+================
+ Requirements
+================
+
+Simple things simple: to run IOSACal you need the following software
+on your computer:
+
+- Python_
+- NumPy_
+- Matplotlib_
+- SciPy_ (optional but recommended)
+
+All are available for major platforms. Order of installation matters.
+
+.. _Python: http://www.python.org/
+.. _NumPy: http://numpy.scipy.org/
+.. _Matplotlib: http://matplotlib.sourceforge.net/
+.. _SciPy: http://www.scipy.org/
+
+Specific operating system instructions
+======================================
+
+Debian/Ubuntu
+-------------
+
+From a terminal::
+
+  sudo apt-get install python-matplotlib python-scipy
+
+(this installs also Python, Numpy and all other requirements).
+
+Windows
+-------
+
+You might find more convenient to use a dedicated Python distribution
+instead of separately installing all packages:
+
+- `Enthought Python Distribution`_ (a commercial distribution for
+  scientific computing)
+- `Python(x,y)`_ (a free distribution for scientific and engineering
+  computing)
+
+.. _`Enthought Python Distribution`: http://enthought.com/products/epd.php
+.. _`Python(x,y)`: http://www.pythonxy.com/
+
+Details
+=======
+
+If you have some time to learn why you need to install these packages
+in order to use IOSACal, here is some more detailed information.
+
+IOSACal is written in the Python programming language, and it makes
+heavy use of the NumPy (Numerical Python) library for the internal
+management of calibration curves and calibrated samples. Calibration
+curves, radiocarbon dates and calibrated curves are handled internally
+as ``ndarray`` objects. ``ndarray`` objects are matrices that can be
+easily manipulated through slicing, flipping, summing and other
+typical operations.
+
+Generation of plots is done through Matplotlib, another Python
+library built on top of NumPy. Matplotlib can natively read
+``ndarray`` objects and plot them in a graphical form. Far from being
+just a set of plotting functions, Matplotlib allows the drawing of
+complex plots like those created by IOSACal.
+
+The optional interpolation of calibration data is done through the
+SciPy `interpolate.interp1d`_ method. Interpolation is disabled by
+default, but it is widely used by other calibration programs, so you
+might want to use it. If you're trying to use interpolation but SciPy
+isn't available, IOSACal will emit a warning.
+
+.. _`interpolate.interp1d`: http://docs.scipy.org/doc/scipy/reference/tutorial/interpolate.html
