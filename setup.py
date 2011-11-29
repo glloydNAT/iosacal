@@ -20,14 +20,14 @@ setup(name='gnucal',
       keywords='radiocarbon calibration',
       author='Stefano Costa',
       author_email='steko@iosa.it',
-      url='http://gnucal.iosa.it/',
+      url='http://c14.iosa.it/',
       license='GNU GPLv3',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       package_data={'gnucal': ['data/*.14c']},
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          # -*- Extra requirements: -*-
+         # -*- Extra requirements: -*-
         'numpy >= 1.2.0',
         'matplotlib >= 0.98.5',
         'scipy >= 0.6.0'
@@ -37,5 +37,4 @@ setup(name='gnucal',
             'gnucal = gnucal.cli:main',
             ]
         },
-      setup_requires = ['setuptools_hg'],
       )
