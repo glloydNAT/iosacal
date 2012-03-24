@@ -3,9 +3,9 @@ import sys, os
 
 version = '0.1'
 
-setup(name='gnucal',
+setup(name='iosacal',
       version=version,
-      description="GNUCal is a radiocarbon (14C) calibration program",
+      description="IOSACal is a radiocarbon (14C) calibration program",
       long_description="""\
 """,
       classifiers=[
@@ -23,7 +23,7 @@ setup(name='gnucal',
       url='http://c14.iosa.it/',
       license='GNU GPLv3',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
-      package_data={'gnucal': ['data/*.14c']},
+      package_data={'iosacal': ['data/*.14c']},
       include_package_data=True,
       zip_safe=False,
       install_requires=[
@@ -34,7 +34,7 @@ setup(name='gnucal',
       ],
       entry_points= {
         'console_scripts': [
-            'gnucal = gnucal.cli:main',
+            'iosacal = iosacal.cli:main',
             ]
         },
       )

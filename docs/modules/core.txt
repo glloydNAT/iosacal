@@ -1,7 +1,7 @@
 :mod:`core` -- Core GNUCal library
 ==================================
 
-.. automodule:: gnucal.core
+.. automodule:: iosacal.core
 
 
 .. autodata:: HAS_SCIPY

@@ -1,7 +1,7 @@
 :mod:`cli` -- GNUCal command line interface
 ===========================================
 
-.. module:: gnucal.cli
+.. module:: iosacal.cli
    :synopsis: command line interface
 
 .. function:: main

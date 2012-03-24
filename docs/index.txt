@@ -23,7 +23,7 @@ License.
 
 .. _IOSA: http://www.iosa.it/
 
-.. image:: images/image_790±60.png
+.. image:: images/image_790-60.png
 
 Why another 14C calibration software ?
 --------------------------------------
