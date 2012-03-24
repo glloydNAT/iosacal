@@ -3,26 +3,26 @@
 # filename: cli.py
 # Copyright 2008-2010 Stefano Costa <steko@iosa.it>
 #
-# This file is part of GNUCal.
+# This file is part of IOSACal, the IOSA Radiocarbon Calibration Library.
 
-# GNUCal is free software: you can redistribute it and/or modify
+# IOSACal is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# GNUCal is distributed in the hope that it will be useful,
+# IOSACal is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with GNUCal.  If not, see <http://www.gnu.org/licenses/>.
+# along with IOSACal.  If not, see <http://www.gnu.org/licenses/>.
 
 import pkg_resources
 
 from optparse import OptionParser, OptionGroup
 
-from gnucal import core, plot, text
+from iosacal import core, plot, text
 
 
 usage = "usage: %prog -d DATE -s SIGMA [other options] ..."
@@ -62,7 +62,7 @@ parser.add_option("-i", "--interpolate",
                   help="interpolate calibration curve to obtain fine-grained"
                        " dating intervals [default: %default]")
 parser.add_option("-n", "--name",
-                  default="gnucal",
+                  default="iosacal",
                   type="str",
                   dest="name",
                   help="name of output image [default: %default]")
@@ -107,7 +107,7 @@ def main():
 
     By default produces text output to stdout for each sample."""
 
-    curve_data_string = pkg_resources.resource_string("gnucal", "data/%s.14c" % options.curve)
+    curve_data_string = pkg_resources.resource_string("iosacal", "data/%s.14c" % options.curve)
     curve = core.CalibrationCurve(curve_data_string, interpolate=options.interpolate)
     calibrated_ages = []
     for d, s in zip(options.date, options.sigma):
@@ -115,7 +115,7 @@ def main():
         ca = core.CalibratedAge(curve, rs, BP=options.BP)
         calibrated_ages.append(ca)
         if options.plot and options.single is True:
-            outputname = 'iosacal_%d±%d.pdf' %(d, s) # default
+            outputname = '%s_%d±%d.pdf' %(options.name, d, s)
             plot.single_plot(ca,oxcal=options.oxcal,output=outputname)
         else:
             print text.single_text(ca)
