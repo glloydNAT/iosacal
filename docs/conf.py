@@ -13,10 +13,33 @@
 
 import sys, os
 
+# Mock out the modules so that sphinx autodoc can run without requiring these
+# platform dependencies
+MOCK_MODULES = ('numpy', 'scipy', 'matplotlib', 'pylab', 'matplotlib.pyplot', 'matplotlib.mlab')
+
+class Mock(object):
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __call__(self, *args, **kwargs):
+        return Mock()
+
+    @classmethod
+    def __getattr__(self, name):
+        if name in ('__file__', '__path__'):
+            return '/dev/null'
+        elif name[0] == name[0].upper():
+            return type(name, (), {})
+        else:
+            return Mock()
+
+for mock in  MOCK_MODULES:
+    sys.modules[mock] = Mock()
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.append(os.path.abspath('.'))
+sys.path.append(os.path.abspath('..'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -43,7 +66,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'IOSACal'
-copyright = u'2008-2010, Stefano Costa and the IOSA project'
+copyright = u'2008-2012, Stefano Costa and the IOSA project'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -96,7 +119,11 @@ pygments_style = 'friendly'
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'haiku'
+
+if os.environ.get('READTHEDOCS', None) == 'True':
+    html_theme = 'default'
+else:
+    html_theme = 'nature'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

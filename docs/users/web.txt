@@ -2,4 +2,5 @@
  Using the web interface
 =========================
 
-The web interface is quite cool.
+The web interface is available as a demo service at
+http://c14.iosa.it/ and it is based on the Flask web framework.

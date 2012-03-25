@@ -1,7 +1,7 @@
 :mod:`plot` -- Plotting functions
 =================================
 
-.. automodule:: iosacaiosacall.plot
+.. automodule:: iosacal.plot
    :synopsis: plotting functions
 
 .. autofunction:: single_plot

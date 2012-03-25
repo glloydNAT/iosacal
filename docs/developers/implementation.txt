@@ -25,5 +25,5 @@ welcome. Please start from the main source repository at bitbucket_.
 .. _Matplotlib: http://matplotlib.sourceforge.net/
 .. _SciPy: http://www.scipy.org/
 .. _`interpolate.interp1d`: http://docs.scipy.org/doc/scipy/reference/tutorial/interpolate.html
-.. _Mercurial: http://www.selenic.com/mercurial/
-.. _bitbucket: http://bitbucket.org/steko/iosacal/overview/
+.. _Mercurial: http://mercurial.selenic.com//
+.. _bitbucket: http://bitbucket.org/iosa/iosacal/overview/

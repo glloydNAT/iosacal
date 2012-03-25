@@ -17,9 +17,9 @@ released soon, but in the meantime you can get the development version from
 bitbucket_, either with the `complete project history`_ or as a simple `source
 archive`_.
 
-.. _bitbucket: http://bitbucket.org/steko/iosacal/
-.. _`complete project history`: http://bitbucket.org/steko/iosacal/overview/
-.. _`source archive`: http://bitbucket.org/steko/iosacal/get/tip.bz2
+.. _bitbucket: http://bitbucket.org/iosa/iosacal/
+.. _`complete project history`: http://bitbucket.org/iosa/iosacal/overview/
+.. _`source archive`: http://bitbucket.org/iosa/iosacal/get/tip.bz2
 
 Installing
 ----------
@@ -163,7 +163,7 @@ The result will be saved into the image file named
 ``iosacal_790±60.pdf`` in the same directory. It will look more or less
 like this:
 
-.. image:: /images/image_790±60.png
+.. image:: /images/image_790-60.png
 
 Other calibration curves
 ------------------------
