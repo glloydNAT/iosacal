@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with IOSACal.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import pkg_resources
 
 from optparse import OptionParser, OptionGroup
@@ -107,7 +108,9 @@ def main():
 
     By default produces text output to stdout for each sample."""
 
-    curve_data_string = pkg_resources.resource_string("iosacal", "data/%s.14c" % options.curve)
+    # resource_string actually returns bytes
+    curve_data_bytes = pkg_resources.resource_string("iosacal", "data/%s.14c" % options.curve)
+    curve_data_string = curve_data_bytes.decode('ascii')
     curve = core.CalibrationCurve(curve_data_string, interpolate=options.interpolate)
     calibrated_ages = []
     for d, s in zip(options.date, options.sigma):
@@ -118,7 +121,7 @@ def main():
             outputname = '%s_%d±%d.pdf' %(options.name, d, s)
             plot.single_plot(ca,oxcal=options.oxcal,output=outputname)
         else:
-            print text.single_text(ca)
+            sys.stdout.write(text.single_text(ca))
     if options.plot and options.multi is True:
         plot.multi_plot(
                         calibrated_ages,

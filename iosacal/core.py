@@ -22,7 +22,7 @@ from csv import reader
 from math import exp, pow, sqrt
 from numpy import arange, array, asarray, flipud
 
-from hpd import alsuren_hpd, confidence_percent
+from iosacal.hpd import alsuren_hpd, confidence_percent
 
 try:
     from scipy.interpolate import interp1d

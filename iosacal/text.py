@@ -63,7 +63,7 @@ def single_text(calibrated_age):
     '''Output calibrated age as text to the terminal.'''
 
     d = text_dict(calibrated_age)
-    output = Template(u'''
+    output = Template('''
 ============
 IOSACal v0.1
 ============
@@ -81,4 +81,4 @@ $intervals68
 $intervals95
 ''')
 
-    return output.substitute(d).encode('utf-8')
+    return output.substitute(d)
