@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # filename: text.py
-# Copyright 2009-2010 Stefano Costa <steko@iosa.it>
+# Copyright 2009-2010, 2013 Stefano Costa <steko@iosa.it>
 #
 # This file is part of IOSACal, the IOSA Radiocarbon Calibration Library.
 
@@ -28,6 +28,7 @@ def text_dict(calibrated_age):
 
     calibrated_curve = calibrated_age.array
     f_m, sigma_m = calibrated_age.f_m, calibrated_age.sigma_m
+    rs_id = calibrated_age.rs_id
     calibration_curve = calibrated_age.calibration_curve
     calibration_curve_title = calibrated_age.calibration_curve_title
     intervals68 = calibrated_age.intervals68
@@ -49,6 +50,7 @@ def text_dict(calibrated_age):
         'calibrated_curve': calibrated_curve,
         'f_m': f_m,
         'sigma_m': sigma_m,
+        'rs_id': rs_id,
         'calibration_curve': calibration_curve,
         'calibration_curve_title': calibration_curve_title,
         'intervals68': string68,
@@ -68,12 +70,15 @@ def single_text(calibrated_age):
 IOSACal v0.1
 ============
 
+Radiocarbon sample
+------------------
+
+$rs_id: $f_m ± $sigma_m BP
+
+Calibrated age
+--------------
+
 $calibration_curve_title
-
-Radiocarbon determination (BP): $f_m ± $sigma_m BP
-
-Calibrated date
----------------
 
 68.2% probability
 $intervals68

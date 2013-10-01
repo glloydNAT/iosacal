@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # filename: core.py
-# Copyright 2008-2009 Stefano Costa <steko@iosa.it>
+# Copyright 2008-2009, 2013 Stefano Costa <steko@iosa.it>
 #
 # This file is part of IOSACal, the IOSA Radiocarbon Calibration Library.
 
@@ -92,12 +92,13 @@ class CalibrationCurve(object):
 class RadiocarbonSample(object):
     '''A radiocarbon determination.'''
 
-    def __init__(self, date, sigma):
+    def __init__(self, date, sigma, id):
         self.date  = date
         self.sigma = sigma
+        self.id = id
 
     def __str__(self):
-        return "RadiocarbonSample( %d ± %d )" % (self.date, self.sigma)
+        return "RadiocarbonSample( {id} {date} ± {sigma} )".format(**self.__dict__)
 
 
 class CalibratedAge(object):
@@ -113,6 +114,7 @@ class CalibratedAge(object):
     def __init__(self, calibration_curve, radiocarbon_sample, BP):
         self.f_m               = radiocarbon_sample.date
         self.sigma_m           = radiocarbon_sample.sigma
+        self.rs_id = radiocarbon_sample.id
         self.calibration_curve = calibration_curve.array.copy()
         self.calibration_curve_title = calibration_curve.title
         self.BP = BP
@@ -141,7 +143,7 @@ class CalibratedAge(object):
         self.intervals95 = alsuren_hpd(self.array,0.046)
 
     def __str__(self):
-        return "CalibratedAge( %d ± %d )" % (self.f_m, self.sigma_m)
+        return "CalibratedAge( {rs_id}, {calibration_curve_title} )".format(**self.__dict__)
 
 
 class ConfidenceInterval(object):

@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # filename: cli.py
-# Copyright 2008-2010 Stefano Costa <steko@iosa.it>
+# Copyright 2008-2010, 2013 Stefano Costa <steko@iosa.it>
 #
 # This file is part of IOSACal, the IOSA Radiocarbon Calibration Library.
 
@@ -41,6 +41,12 @@ parser.add_option("-s", "--sigma",
                 dest="sigma",
                 help="standard deviation for date",
                 metavar="SIGMA")
+parser.add_option("--id",
+                  action="append",
+                  type="str",
+                  dest="id",
+                  metavar="ID",
+                  help="sample identification")
 parser.add_option("-p", "--plot",
                   default=False,
                   dest="plot",
@@ -113,8 +119,8 @@ def main():
     curve_data_string = curve_data_bytes.decode('ascii')
     curve = core.CalibrationCurve(curve_data_string, interpolate=options.interpolate)
     calibrated_ages = []
-    for d, s in zip(options.date, options.sigma):
-        rs = core.RadiocarbonSample(d,s)
+    for d, s, id in zip(options.date, options.sigma, options.id):
+        rs = core.RadiocarbonSample(d, s, id)
         ca = core.CalibratedAge(curve, rs, BP=options.BP)
         calibrated_ages.append(ca)
         if options.plot and options.single is True:

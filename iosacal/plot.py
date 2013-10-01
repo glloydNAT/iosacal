@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # filename: plot.py
-# Copyright 2009 Stefano Costa <steko@iosa.it>
+# Copyright 2009, 2013 Stefano Costa <steko@iosa.it>
 #
 # This file is part of IOSACal, the IOSA Radiocarbon Calibration Library.
 
@@ -32,6 +32,7 @@ def single_plot(calibrated_age, oxcal=True, output=None):
 
     calibrated_curve = calibrated_age.array
     f_m, sigma_m = calibrated_age.f_m, calibrated_age.sigma_m
+    rs_id = calibrated_age.rs_id
     calibration_curve = calibrated_age.calibration_curve
     calibration_curve_title = calibrated_age.calibration_curve_title
     intervals68 = calibrated_age.intervals68
@@ -74,7 +75,7 @@ def single_plot(calibrated_age, oxcal=True, output=None):
     ax1 = plt.subplot(111)
     plt.xlabel("Calibrated date (%s)" % ad_bp_label)
     plt.ylabel("Radiocarbon determination (BP)")
-    plt.text(0.5, 0.95,r'EXAMPLE: $%d \pm %d BP$' % (f_m, sigma_m),
+    plt.text(0.5, 0.95,r'%s: $%d \pm %d BP$' % (rs_id, f_m, sigma_m),
          horizontalalignment='center',
          verticalalignment='center',
          transform = ax1.transAxes,
