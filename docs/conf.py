@@ -196,7 +196,7 @@ html_title = 'IOSACal'
 # -- Options for LaTeX output --------------------------------------------------
 
 # The paper size ('letter' or 'a4').
-#latex_paper_size = 'letter'
+latex_paper_size = 'a4'
 
 # The font size ('10pt', '11pt' or '12pt').
 #latex_font_size = '10pt'
@@ -204,7 +204,7 @@ html_title = 'IOSACal'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'GNUCal.tex', u'GNUCal Documentation',
+  ('index', 'IOSACal.tex', u'IOSACal Documentation',
    u'Stefano Costa', 'manual'),
 ]
 
@@ -223,4 +223,4 @@ latex_documents = [
 #latex_appendices = []
 
 # If false, no module index is generated.
-#latex_use_modindex = True
+latex_use_modindex = False
