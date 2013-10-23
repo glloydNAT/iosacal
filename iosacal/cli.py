@@ -116,7 +116,7 @@ def main():
 
     # resource_string actually returns bytes
     curve_data_bytes = pkg_resources.resource_string("iosacal", "data/%s.14c" % options.curve)
-    curve_data_string = curve_data_bytes.decode('ascii')
+    curve_data_string = curve_data_bytes.decode('latin1')
     curve = core.CalibrationCurve(curve_data_string, interpolate=options.interpolate)
     calibrated_ages = []
     for d, s, id in zip(options.date, options.sigma, options.id):
