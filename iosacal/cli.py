@@ -62,12 +62,6 @@ parser.add_option("-o", "--oxcal",
                   dest="oxcal",
                   default=False,
                   help="draw plots more OxCal-like looking [default: %default]")
-parser.add_option("-i", "--interpolate",
-                  default=False,
-                  action="store_true",
-                  dest="interpolate",
-                  help="interpolate calibration curve to obtain fine-grained"
-                       " dating intervals [default: %default]")
 parser.add_option("-n", "--name",
                   default="iosacal",
                   type="str",

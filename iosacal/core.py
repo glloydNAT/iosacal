@@ -20,17 +20,9 @@
 
 from csv import reader
 from math import exp, pow, sqrt
-from numpy import arange, array, asarray, flipud
+from numpy import arange, array, asarray, flipud, interp
 
 from iosacal.hpd import alsuren_hpd, confidence_percent
-
-try:
-    from scipy.interpolate import interp1d
-except ImportError:
-    #: if SciPy is available, also interpolation will be
-    HAS_SCIPY = False
-else:
-    HAS_SCIPY = True
 
 
 def calibrate(f_m, sigma_m, f_t, sigma_t):
@@ -54,7 +46,7 @@ class CalibrationCurve(object):
     Calibration data is loaded at runtime from source data files, and
     exposed as an ``array`` object.'''
 
-    def __init__(self, calibration_string, interpolate=False):
+    def __init__(self, calibration_string):
         self._lines = calibration_string.splitlines()
         self.interpolate = interpolate
         self.title = self._lines[0].strip('#\n')
@@ -62,28 +54,19 @@ class CalibrationCurve(object):
         self._list = reader(self._data, skipinitialspace = True)
         # force calibration curve values as floats
         self.array = array(list(self._list)).astype('d')
-        if self.interpolate is True:
-            self._interpolate()
+        self._interpolate()
 
         # TODO define __array__interface__ for all these objects...
 
     def _interpolate(self):
-        '''Interpolate calibration curve for more fine-grained results.'''
-        if HAS_SCIPY is True:
-            # XXX interp1d only accepts ascending values
-            self.array = flipud(self.array)
-            self._arange = arange(self.array[0,0],self.array[-1,0],1)
-            self._spline_0 = interp1d(self.array[:,0],self.array[:,1])
-            self._interpolated_0 = self._spline_0(self._arange)
-            self._spline_1 = interp1d(self.array[:,0],self.array[:,2])
-            self._interpolated_1 = self._spline_1(self._arange)
-            self._array2 = array([self._arange,
-                                  self._interpolated_0,
-                                  self._interpolated_1]
-                                ).transpose()
-            self.array = flipud(self._array2) # see above XXX
-        else:
-            pass
+        '''Linear interpolation of calibration data.'''
+
+        ud_curve = flipud(self.array)  # the sequence must be *increasing*
+        curve_arange = arange(ud_curve[0,0],ud_curve[-1,0],1)
+        values_interp = interp(curve_arange, ud_curve[:,0], ud_curve[:,1])
+        stderr_interp = interp(curve_arange, ud_curve[:,0], ud_curve[:,2])
+        ud_curve_interp = array([curve_arange, values_interp, stderr_interp]).transpose()
+        self.array = flipud(ud_curve_interp)  # back to *decreasing* sequence
 
     def __str__(self):
         return "CalibrationCurve( %s )" % self.title
