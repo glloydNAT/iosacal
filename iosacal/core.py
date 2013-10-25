@@ -47,13 +47,12 @@ class CalibrationCurve(object):
     exposed as an ``array`` object.'''
 
     def __init__(self, calibration_string):
-        self._lines = calibration_string.splitlines()
-        self.interpolate = interpolate
-        self.title = self._lines[0].strip('#\n')
-        self._data = [ l for l in self._lines if not '#' in l ]
-        self._list = reader(self._data, skipinitialspace = True)
+        _lines = calibration_string.splitlines()
+        self.title = _lines[0].strip('#\n')
+        _data = [ l for l in _lines if not '#' in l ]
+        _list = list(reader(_data, skipinitialspace=True))
         # force calibration curve values as floats
-        self.array = array(list(self._list)).astype('d')
+        self.array = array(_list, dtype='d')
         self._interpolate()
 
         # TODO define __array__interface__ for all these objects...
