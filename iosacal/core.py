@@ -127,10 +127,3 @@ class CalibratedAge(object):
     def __str__(self):
         return "CalibratedAge( {rs_id}, {calibration_curve_title} )".format(**self.__dict__)
 
-
-class ConfidenceInterval(object):
-    '''A confidence interval expressed as a probability percent.'''
-
-    def __init__(self):
-        pass
-
