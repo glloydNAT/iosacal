@@ -161,3 +161,30 @@ class CalAge(np.ndarray):
         calendarray[:,0] *= -1
         calendarray[:,0] += 1950
         return calendarray
+
+
+def combine(determinations):
+    '''Combine n>1 determinations related to the same event.
+
+    ``determinations`` is an iterable of tuples (mean, error).
+
+    This covers case 1 as described by Ward and Wilson in their
+    seminal 1978 paper (DOI: 10.1111/j.1475-4754.1978.tb00208.x)
+
+    '''
+
+    m, s, ids = zip(*[(d.date, d.sigma, d.id) for d in determinations])
+
+    # pooled mean
+    pool_m = sum(mi / si**2 for mi, si in zip(m, s)) / \
+             sum(1 / si**2 for si in s)
+
+    # standard error on the pooled mean
+    pool_s = sqrt(1/sum(1/si**2 for si in s))
+
+    # test statistic
+    test = sum((mi - pool_m)**2 / si**2 for mi, si in zip(m, s))
+
+    desc = 'Combined from {} with test statistic {:.3f}'.format(', '.join(ids), test)
+
+    return R(pool_m, pool_s, desc)
