@@ -28,27 +28,31 @@ from pylab import normpdf
 
 from iosacal import hpd, util
 
-def single_plot(calibrated_age, oxcal=True, output=None):
+COLORS = {
+    'bgcolor': '#e5e4e5',
+}
 
-    calibrated_curve = calibrated_age.array
-    f_m, sigma_m = calibrated_age.f_m, calibrated_age.sigma_m
-    rs_id = calibrated_age.rs_id
+def single_plot(calibrated_age, oxcal=False, output=None, BP=True):
+
+    calibrated_age = calibrated_age
+    f_m = calibrated_age.radiocarbon_sample.date
+    sigma_m = calibrated_age.radiocarbon_sample.sigma
+    radiocarbon_sample_id = calibrated_age.radiocarbon_sample.id
     calibration_curve = calibrated_age.calibration_curve
-    calibration_curve_title = calibrated_age.calibration_curve_title
+    calibration_curve_title = calibrated_age.calibration_curve.title
     intervals68 = calibrated_age.intervals68
     intervals95 = calibrated_age.intervals95
-    BP = calibrated_age.BP
 
     min_year, max_year = (50000, -50000)
 
-    if min_year < min(calibrated_curve[:,0]):
+    if min_year < min(calibrated_age[:,0]):
         pass
     else:
-        min_year = min(calibrated_curve[:,0])
-    if max_year > max(calibrated_curve[:,0]):
+        min_year = min(calibrated_age[:,0])
+    if max_year > max(calibrated_age[:,0]):
         pass
     else:
-        max_year = max(calibrated_curve[:,0])
+        max_year = max(calibrated_age[:,0])
 
     if BP is False:
         if min_year < 0 and max_year > 0:
@@ -62,20 +66,21 @@ def single_plot(calibrated_age, oxcal=True, output=None):
 
     string68 = "".join(
         util.interval_to_string(
-            itv, calibrated_curve, BP
+            itv, calibrated_age, BP
             ) for itv in intervals68
         )
     string95 = "".join(
         util.interval_to_string(
-            itv, calibrated_curve, BP
+            itv, calibrated_age, BP
             ) for itv in intervals95
         )
 
     fig = plt.figure(figsize=(12,8))
     ax1 = plt.subplot(111)
-    plt.xlabel("Calibrated date (%s)" % ad_bp_label)
+    ax1.set_axis_bgcolor(COLORS['bgcolor'])
+    plt.xlabel("Calibrated age (%s)" % ad_bp_label)
     plt.ylabel("Radiocarbon determination (BP)")
-    plt.text(0.5, 0.95,r'%s: $%d \pm %d BP$' % (rs_id, f_m, sigma_m),
+    plt.text(0.5, 0.95,r'%s: $%d \pm %d BP$' % (radiocarbon_sample_id, f_m, sigma_m),
          horizontalalignment='center',
          verticalalignment='center',
          transform = ax1.transAxes,
@@ -100,35 +105,35 @@ def single_plot(calibrated_age, oxcal=True, output=None):
     if oxcal is True:
         # imitate OxCal
         ax2.fill(
-            calibrated_curve[:,0],
-            calibrated_curve[:,1] + max(calibrated_curve[:,1])*0.3,
+            calibrated_age[:,0],
+            calibrated_age[:,1] + max(calibrated_age[:,1])*0.3,
             'k',
             alpha=0.3,
             label='Calendar Age'
             )
         ax2.plot(
-            calibrated_curve[:,0],
-            calibrated_curve[:,1],
+            calibrated_age[:,0],
+            calibrated_age[:,1],
             'k',
             alpha=0
             )
     else:
         ax2.fill(
-            calibrated_curve[:,0],
-            calibrated_curve[:,1],
+            calibrated_age[:,0],
+            calibrated_age[:,1],
             'k',
             alpha=0.3,
             label='Calendar Age'
             )
         ax2.plot(
-            calibrated_curve[:,0],
-            calibrated_curve[:,1],
+            calibrated_age[:,0],
+            calibrated_age[:,1],
             'k',
             alpha=0
             )
 
-    ax2.set_ybound(min(calibrated_curve[:,1]),max(calibrated_curve[:,1])*3)
-    ax2.set_xbound(min(calibrated_curve[:,0]),max(calibrated_curve[:,0]))
+    ax2.set_ybound(min(calibrated_age[:,1]),max(calibrated_age[:,1])*3)
+    ax2.set_xbound(min(calibrated_age[:,0]),max(calibrated_age[:,0]))
     ax2.set_axis_off()
 
     # Radiocarbon Age
@@ -142,25 +147,19 @@ def single_plot(calibrated_age, oxcal=True, output=None):
         'r',
         alpha=0.3
         )
-    ax3.plot(
-        sample_curve,
-        sample_interval,
-        'r',
-        alpha=0.3,
-        label='Radiocarbon determination (BP)'
-        )
     ax3.set_xbound(0,max(sample_curve)*4)
     ax3.set_axis_off()
 
     # Calibration Curve
 
-    mlab_low  = [ n[1] - n[2] for n in calibration_curve ]
-    mlab_high = [ n[1] + n[2] for n in calibration_curve ]
+    mlab_low = calibration_curve[:,1] - calibration_curve[:,2]
+    mlab_high = calibration_curve[:,1] + calibration_curve[:,2]
 
     xs, ys = mlab.poly_between(calibration_curve[:,0],
                                mlab_low,
                                mlab_high)
-    ax1.fill(xs, ys, 'b', alpha=0.3)
+    ax1.fill(xs, ys, fc='#000000', ec='none', alpha=0.15)
+    ax1.plot(calibration_curve[:,0], calibration_curve[:,1], '#000000', alpha=0.5)
 
     # Confidence intervals
 
@@ -218,7 +217,8 @@ def single_plot(calibrated_age, oxcal=True, output=None):
     # FIXME the following values 10 and 5 are arbitrary and could be probably
     # drawn from the f_m value itself, while preserving their ratio
     ax1.set_ybound(f_m - sigma_m * 15, f_m + sigma_m * 5)
-    ax1.set_xbound(min(calibrated_curve[:,0]),max(calibrated_curve[:,0]))
+    ax1.set_xbound(min(calibrated_age[:,0]),max(calibrated_age[:,0]))
+    ax1.invert_xaxis()          # if BP == True
 
     #plt.savefig('image_%d±%d.pdf' %(f_m, sigma_m))
     if output:

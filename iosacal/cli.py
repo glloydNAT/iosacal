@@ -114,8 +114,8 @@ def main():
     curve = core.CalibrationCurve(curve_data_string)
     calibrated_ages = []
     for d, s, id in zip(options.date, options.sigma, options.id):
-        rs = core.RadiocarbonSample(d, s, id)
-        ca = core.CalibratedAge(curve, rs, BP=options.BP)
+        rs = core.R(d, s, id)
+        ca = rs.calibrate(options.curve)
         calibrated_ages.append(ca)
         if options.plot and options.single is True:
             outputname = '%s_%d±%d.pdf' %(options.name, d, s)

@@ -26,14 +26,15 @@ def text_dict(calibrated_age):
 
     This is useful for the web interface and for other custom output.'''
 
-    calibrated_curve = calibrated_age.array
-    f_m, sigma_m = calibrated_age.f_m, calibrated_age.sigma_m
-    rs_id = calibrated_age.rs_id
+    calibrated_curve = calibrated_age
+    f_m = calibrated_age.radiocarbon_sample.date
+    sigma_m = calibrated_age.radiocarbon_sample.sigma
+    rs_id = calibrated_age.radiocarbon_sample.id
     calibration_curve = calibrated_age.calibration_curve
-    calibration_curve_title = calibrated_age.calibration_curve_title
+    calibration_curve_title = calibrated_age.calibration_curve.title
     intervals68 = calibrated_age.intervals68
     intervals95 = calibrated_age.intervals95
-    BP = calibrated_age.BP
+    BP = True
 
     string68 = "".join(
         util.interval_to_string(

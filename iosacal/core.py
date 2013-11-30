@@ -18,9 +18,12 @@
 # You should have received a copy of the GNU General Public License
 # along with IOSACal.  If not, see <http://www.gnu.org/licenses/>.
 
+import pkg_resources
+
 from csv import reader
 from math import exp, pow, sqrt
-from numpy import arange, array, asarray, flipud, interp
+
+import numpy as np
 
 from iosacal.hpd import alsuren_hpd, confidence_percent
 
@@ -40,90 +43,121 @@ See doi: 10.1111/j.1475-4754.2008.00394.x for a detailed account.'''
     return P_t
 
 
-class CalibrationCurve(object):
+class CalibrationCurve(np.ndarray):
     '''A radiocarbon calibration curve.
 
     Calibration data is loaded at runtime from source data files, and
-    exposed as an ``array`` object.'''
+    exposed a ``numpy.ndarray`` object.
 
-    def __init__(self, calibration_string):
+    Taken from
+    http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
+
+    '''
+
+    def __new__(cls, calibration_string):
         _lines = calibration_string.splitlines()
-        self.title = _lines[0].strip('#\n')
         _data = [ l for l in _lines if not '#' in l ]
-        _list = list(reader(_data, skipinitialspace=True))
+        _dlist = list(reader(_data, skipinitialspace=True))
         # force calibration curve values as floats
-        self.array = array(_list, dtype='d')
-        self._interpolate()
+        _darray = np.asarray(_dlist, dtype='d')
+        # linear interpolation
+        ud_curve = np.flipud(_darray)  # the sequence must be *increasing*
+        curve_arange = np.arange(ud_curve[0,0],ud_curve[-1,0],1)
+        values_interp = np.interp(curve_arange, ud_curve[:,0], ud_curve[:,1])
+        stderr_interp = np.interp(curve_arange, ud_curve[:,0], ud_curve[:,2])
+        ud_curve_interp = np.array([curve_arange, values_interp, stderr_interp]).transpose()
+        _darray = np.flipud(ud_curve_interp)  # back to *decreasing* sequence
+        # We cast _darray to be our class type
+        obj = np.asarray(_darray).view(cls)
+        # add the new attribute to the created instance
+        obj.title = _lines[0].strip('#\n')
+        # Finally, we must return the newly created object:
+        return obj
 
-        # TODO define __array__interface__ for all these objects...
-
-    def _interpolate(self):
-        '''Linear interpolation of calibration data.'''
-
-        ud_curve = flipud(self.array)  # the sequence must be *increasing*
-        curve_arange = arange(ud_curve[0,0],ud_curve[-1,0],1)
-        values_interp = interp(curve_arange, ud_curve[:,0], ud_curve[:,1])
-        stderr_interp = interp(curve_arange, ud_curve[:,0], ud_curve[:,2])
-        ud_curve_interp = array([curve_arange, values_interp, stderr_interp]).transpose()
-        self.array = flipud(ud_curve_interp)  # back to *decreasing* sequence
+    def __array_finalize__(self, obj):
+        # see InfoArray.__array_finalize__ for comments
+        if obj is None: return
+        self.title = getattr(obj, 'title', None)
 
     def __str__(self):
         return "CalibrationCurve( %s )" % self.title
 
 
-class RadiocarbonSample(object):
-    '''A radiocarbon determination.'''
+class RadiocarbonDetermination(object):
+    '''A radiocarbon determination as reported by the lab.'''
 
     def __init__(self, date, sigma, id):
         self.date  = date
         self.sigma = sigma
         self.id = id
 
+    def calibrate(self, curve):
+        '''Perform calibration, given a calibration curve.'''
+
+        if not isinstance(curve, CalibrationCurve):
+            curve_data_bytes = pkg_resources.resource_string("iosacal", "data/%s.14c" % curve)
+            curve_data_string = curve_data_bytes.decode('latin1')
+            curve = CalibrationCurve(curve_data_string)
+
+        _calibrated_list = []
+        for i in curve:
+            f_t, sigma_t = i[1:3]
+            ca = calibrate(self.date, self.sigma, f_t, sigma_t)
+            # FIXME this treshold value is completely arbitrary
+            if ca > 0.000000001:
+                _calibrated_list.append((i[0],ca))
+        cal_age = CalAge(np.array(_calibrated_list), self, curve)
+        return cal_age
+
     def __str__(self):
         return "RadiocarbonSample( {id} {date} ± {sigma} )".format(**self.__dict__)
 
 
-class CalibratedAge(object):
+class R(RadiocarbonDetermination):
+    '''Shorthand for RadiocarbonDetermination.'''
+
+    pass
+
+
+class CalAge(np.ndarray):
+
     '''A calibrated radiocarbon age.
 
-    This object is self-contained, it exposes both the calibration curve and
-    the radiocarbon sample objects so that they're available for output
-    interfaces directly.
+    It is expressed as a probability distribution on the calBP
+    calendar scale.
 
-    Also ``BP`` is an attribute of CalibratedAge, that determines the desired
-    output requested by the user.'''
+    Taken from
+    http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
 
-    def __init__(self, calibration_curve, radiocarbon_sample, BP):
-        self.f_m               = radiocarbon_sample.date
-        self.sigma_m           = radiocarbon_sample.sigma
-        self.rs_id = radiocarbon_sample.id
-        self.calibration_curve = calibration_curve.array.copy()
-        self.calibration_curve_title = calibration_curve.title
-        self.BP = BP
-        
-        _calibrated_list = []
-        for i in self.calibration_curve:
-            f_t, sigma_t = i[1:3]
-            ca = calibrate(self.f_m, self.sigma_m, f_t, sigma_t)
-            # FIXME this treshold value is completely arbitrary
-            if ca > 0.000000001:
-                _calibrated_list.append((i[0],ca))
-        self.array = asarray(_calibrated_list)
-        
-        if self.BP is False:
-            self.calibration_curve[:,0] *= -1
-            self.calibration_curve[:,0] += 1950
-            self.array[:,0] *= -1
-            self.array[:,0] += 1950
-        
-        self._confidence_intervals()
+    '''
 
-    def _confidence_intervals(self):
-        '''Derive confidence intervals with HPD routine.'''
+    def __new__(cls, input_array, radiocarbon_sample, calibration_curve):
+        # Input array is an already formed ndarray instance
+        # We first cast to be our class type
+        obj = np.asarray(input_array).view(cls)
+        # add the new attribute to the created instance
+        obj.radiocarbon_sample = radiocarbon_sample
+        obj.calibration_curve = calibration_curve
+        obj.intervals68 = alsuren_hpd(obj,0.318)
+        obj.intervals95 = alsuren_hpd(obj,0.046)
+        # Finally, we must return the newly created object:
+        return obj
 
-        self.intervals68 = alsuren_hpd(self.array,0.318)
-        self.intervals95 = alsuren_hpd(self.array,0.046)
+    def __array_finalize__(self, obj):
+        # see InfoArray.__array_finalize__ for comments
+        if obj is None: return
+        self.radiocarbon_sample = getattr(obj, 'radiocarbon_sample', None)
+        self.calibration_curve = getattr(obj, 'calibration_curve', None)
 
-    def __str__(self):
-        return "CalibratedAge( {rs_id}, {calibration_curve_title} )".format(**self.__dict__)
+    def calendar(self):
+        '''Return the calibrated age on the calAD calendar scale.
 
+        This method returns a copy of the calBP array, leaving the
+        main object untouched.
+
+        '''
+
+        calendarray = self.copy()
+        calendarray[:,0] *= -1
+        calendarray[:,0] += 1950
+        return calendarray
