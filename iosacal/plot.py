@@ -42,17 +42,27 @@ def single_plot(calibrated_age, oxcal=False, output=None, BP=True):
     calibration_curve_title = calibrated_age.calibration_curve.title
     intervals68 = calibrated_age.intervals68
     intervals95 = calibrated_age.intervals95
+    sample_interval = 1950 - calibration_curve[:,0].copy() # for determination plot
 
     min_year, max_year = (50000, -50000)
 
-    if min_year < min(calibrated_age[:,0]):
+    minx = min(calibrated_age[:,0])
+    maxx = max(calibrated_age[:,0])
+
+    if min_year < minx:
         pass
     else:
-        min_year = min(calibrated_age[:,0])
-    if max_year > max(calibrated_age[:,0]):
+        min_year = minx
+    if max_year > maxx:
         pass
     else:
-        max_year = max(calibrated_age[:,0])
+        max_year = maxx
+
+    # do not plot the part of calibration curve that is not visible
+    # greatly reduces execution time \o/
+    cutmin = calibration_curve[calibration_curve[:,0]>minx]
+    cutmax = cutmin[cutmin[:,0]<maxx]
+    calibration_curve = cutmax
 
     if BP is False:
         if min_year < 0 and max_year > 0:
@@ -137,7 +147,6 @@ def single_plot(calibrated_age, oxcal=False, output=None, BP=True):
     ax2.set_axis_off()
 
     # Radiocarbon Age
-    sample_interval = 1950 - calibration_curve[:,0].copy()
     sample_curve = normpdf(sample_interval, f_m, sigma_m)
 
     ax3 = plt.twiny(ax1)
