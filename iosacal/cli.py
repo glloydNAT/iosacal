@@ -53,7 +53,7 @@ parser.add_option("-p", "--plot",
                   action="store_true",
                   help="output results to graphic plot")
 parser.add_option("-c", "--curve",
-                  default="intcal13",
+                  default="intcal20",
                   type="str",
                   dest="curve",
                   help="calibration curve to be used [default: %default]")
