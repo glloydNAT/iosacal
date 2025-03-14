@@ -1,3 +1,6 @@
+[DOI](https://zenodo.org/records/7133343)
+
+
 A radiocarbon calibration software
 ==================================
 
