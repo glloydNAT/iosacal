@@ -1,0 +1,1 @@
+- add -f command line flag option to allow for reading a csv file.  It should disable the -d and -s flags when present.
